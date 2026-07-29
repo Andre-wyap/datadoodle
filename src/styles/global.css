@@ -84,6 +84,9 @@
 
   --gutter: 64px;
   --shell: min(100% - (var(--gutter) * 2), 1280px);
+  /* Height of the sticky header. Anchor offsets and the sticky form both read
+     from this, so the bar can change height without them drifting. */
+  --header-h: 84px;
   --section-space: clamp(80px, 8vw, 120px);
   /* Shared by the hero and final-CTA grids so the copy column, the form and
      the exhibit below them all resolve to the same column edges. */
@@ -270,6 +273,9 @@ strong {
 
 /* Header ------------------------------------------------------------------ */
 .site-header {
+  position: sticky;
+  z-index: 30;
+  top: 0;
   background: var(--paper);
   border-bottom: 1px solid var(--rule-light);
 }
@@ -279,7 +285,161 @@ strong {
   align-items: center;
   justify-content: space-between;
   gap: var(--s4);
-  min-height: 84px;
+  min-height: var(--header-h);
+}
+
+/* Anything the nav points at clears the bar before it settles. */
+main [id],
+#top {
+  scroll-margin-top: calc(var(--header-h) + var(--s2));
+}
+
+/* Section nav ------------------------------------------------------------- */
+.site-nav ul {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 1.8vw, 28px);
+  padding: 0;
+  list-style: none;
+}
+
+.site-nav a {
+  display: block;
+  padding-block: 4px;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 180ms var(--ease), border-color 180ms var(--ease);
+}
+
+.site-nav a:hover {
+  color: var(--ink);
+  border-bottom-color: var(--rule);
+}
+
+/* Set by the scroll spy on the section currently under the header. Ink, not
+   Signal Red — the accent is reserved for annotation, results and focus. */
+.site-nav a[aria-current="true"] {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+/* Hamburger. Three rules that fold into a cross, both under 300ms. */
+.nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-right: -10px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.nav-toggle .bars {
+  position: relative;
+  display: block;
+  width: 22px;
+  height: 14px;
+}
+
+.nav-toggle i {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  transition: transform 220ms var(--ease), opacity 120ms linear;
+}
+
+.nav-toggle i:nth-child(1) {
+  top: 0;
+}
+
+.nav-toggle i:nth-child(2) {
+  top: 6px;
+}
+
+.nav-toggle i:nth-child(3) {
+  top: 12px;
+}
+
+.nav-toggle[aria-expanded="true"] i:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.nav-toggle[aria-expanded="true"] i:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-toggle[aria-expanded="true"] i:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* Mobile panel. Hidden from the tab order until it is open. */
+.nav-panel {
+  position: absolute;
+  inset: 100% 0 auto;
+  display: none;
+  max-height: calc(100dvh - var(--header-h));
+  overflow-y: auto;
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 200ms var(--ease), transform 200ms var(--ease), visibility 0s linear 200ms;
+}
+
+.site-header.nav-open .nav-panel {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition-delay: 0s;
+}
+
+.nav-panel ul {
+  padding: var(--s1) 0 0;
+  list-style: none;
+}
+
+.nav-panel li + li a {
+  border-top: 1px solid var(--rule-light);
+}
+
+.nav-panel ul a {
+  display: block;
+  padding: 15px 0;
+  color: var(--ink-body);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.nav-panel ul a[aria-current="true"] {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.nav-panel-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: var(--s3) 0 var(--s4);
+  min-height: 52px;
+  background: var(--ink);
+  border-radius: 4px;
+  color: var(--surface);
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .brand {
@@ -377,7 +537,7 @@ strong {
 
 .hero-panel {
   position: sticky;
-  top: var(--s4);
+  top: calc(var(--header-h) + var(--s4));
 }
 
 .panel h2 {
@@ -400,6 +560,17 @@ strong {
 .hero-exhibit {
   max-width: calc((100% - var(--split-gap)) * 7 / 12);
   margin-top: var(--s10);
+}
+
+.hero-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
 }
 
 /* Marquee: the hero's closing band and the divider into the next section.
@@ -600,6 +771,132 @@ strong {
   font-size: 1.1875rem;
 }
 
+/* AI widgets ---------------------------------------------------------------
+   Real answers used as evidence — query, answer, status and supporting
+   points — as opposed to <Exhibit>'s screenshot/skeleton pair. */
+.ai-widget {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  transition: border-color 200ms var(--ease);
+}
+
+.ai-widget:hover {
+  border-color: var(--outline);
+}
+
+.ai-widget-bar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s3);
+  padding: 12px var(--s3);
+  border-bottom: 1px solid var(--rule-light);
+  color: var(--data-gray);
+  font: 500 0.6875rem/1.5 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ai-widget-expand {
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--data-gray);
+  font: inherit;
+  letter-spacing: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color 180ms var(--ease);
+}
+
+.ai-widget-expand:hover {
+  color: var(--ink);
+}
+
+.ai-widget-body {
+  padding: var(--s5);
+}
+
+.ai-widget-query {
+  margin-bottom: var(--s4);
+  color: var(--ink);
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+
+.ai-widget-answer {
+  margin-bottom: var(--s3);
+  color: var(--ink-body);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+.ai-widget-answer .named {
+  padding: 2px 6px;
+  border: 1px solid var(--signal);
+  border-radius: 4px;
+  color: var(--ink);
+  font-weight: 700;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.ai-widget-status {
+  display: inline-block;
+  margin-bottom: var(--s4);
+  color: var(--signal);
+  font: 500 0.6875rem/1.5 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ai-widget-points {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 var(--s4);
+  padding: var(--s4) 0 0;
+  border-top: 1px solid var(--rule-light);
+  list-style: none;
+}
+
+.ai-widget-points li {
+  position: relative;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.ai-widget-points li::before {
+  content: "";
+  position: absolute;
+  top: 0.5em;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  background: var(--ink);
+}
+
+.ai-widget-note {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-style: italic;
+}
+
+.ai-widget-source {
+  margin-top: auto;
+  padding: 12px var(--s3);
+  border-top: 1px solid var(--rule-light);
+  color: var(--data-gray);
+  font: 500 0.6875rem/1.5 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 /* Four fears -------------------------------------------------------------- */
 .fear {
   display: grid;
@@ -705,7 +1002,8 @@ strong {
 
 /* Two lines reserved, so the answer row and the tag sit on the same line in
    all three exhibits whether the question wraps or not. */
-.exhibit-grid .exhibit-query {
+.exhibit-grid .exhibit-query,
+.exhibit-grid .ai-widget-query {
   min-height: 3.2em;
 }
 
@@ -730,6 +1028,46 @@ strong {
 
 .shift .skeleton {
   background: #3a3d3c;
+}
+
+.shift .ai-widget {
+  background: #262827;
+  border-color: var(--inverse-rule);
+}
+
+.shift .ai-widget-bar,
+.shift .ai-widget-source {
+  border-color: var(--inverse-rule);
+  color: var(--inverse-muted);
+}
+
+.shift .ai-widget-query,
+.shift .ai-widget-answer {
+  color: var(--inverse-on);
+}
+
+.shift .ai-widget-points {
+  border-color: var(--inverse-rule);
+}
+
+.shift .ai-widget-points li {
+  color: var(--inverse-muted);
+}
+
+.shift .ai-widget-points li::before {
+  background: var(--inverse-on);
+}
+
+.shift .ai-widget-note {
+  color: var(--inverse-muted);
+}
+
+.shift .ai-widget-expand {
+  color: var(--inverse-muted);
+}
+
+.shift .ai-widget-expand:hover {
+  color: var(--inverse-on);
 }
 
 /* Columns: pillars, cases, tiers -----------------------------------------
@@ -1190,11 +1528,72 @@ strong {
   display: none;
 }
 
+/* Screenshot lightbox ------------------------------------------------------
+   Opened from an <AIWidget>'s "View screenshot" control. Plain overlay, no
+   chrome borrowed from any search interface. */
+.lightbox {
+  position: fixed;
+  z-index: 70;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--s5);
+  background: rgba(17, 17, 17, 0.86);
+}
+
+.lightbox[hidden] {
+  display: none;
+}
+
+.lightbox img {
+  max-width: min(100%, 960px);
+  max-height: calc(100dvh - var(--s8));
+  width: auto;
+  height: auto;
+  border-radius: 4px;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: var(--s3);
+  right: var(--s3);
+  width: 44px;
+  height: 44px;
+  background: none;
+  border: 1px solid var(--inverse-rule);
+  border-radius: 4px;
+  color: var(--inverse-on);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 180ms var(--ease);
+}
+
+.lightbox-close:hover {
+  border-color: var(--inverse-on);
+}
+
 /* 7. Responsive ----------------------------------------------------------- */
 
 @media (max-width: 1080px) {
   :root {
     --gutter: 32px;
+  }
+
+  /* Below this width the seven labels stop fitting beside the logo, so the
+     nav moves wholesale into the panel. */
+  .site-nav,
+  .site-header .header-action {
+    display: none;
+  }
+
+  .nav-toggle,
+  .nav-panel {
+    display: block;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
   }
 
   .hero-grid,
@@ -1234,7 +1633,8 @@ strong {
     max-width: 620px;
   }
 
-  .exhibit-grid .exhibit-query {
+  .exhibit-grid .exhibit-query,
+  .exhibit-grid .ai-widget-query {
     min-height: 0;
   }
 
@@ -1251,22 +1651,15 @@ strong {
   :root {
     --gutter: 16px;
     --section-space: 64px;
+    --header-h: 68px;
   }
 
   body {
     padding-bottom: 76px;
   }
 
-  .site-header .shell {
-    min-height: 68px;
-  }
-
   .brand img {
     height: 22px;
-  }
-
-  .header-action {
-    font-size: 0.8125rem;
   }
 
   h1 {

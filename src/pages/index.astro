@@ -2,8 +2,9 @@
 import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import LeadForm from "../components/LeadForm.astro";
-import Exhibit from "../components/Exhibit.astro";
+import AIWidget from "../components/AIWidget.astro";
 import logoLockup from "../assets/logo-lockup.png";
+import chatbotVideo from "../../Chatbot_simulation_for_website_202607291507.mp4?url";
 
 const ticks = ["Remove trust friction", "Generate quality leads", "Easier to close for sales people"];
 
@@ -32,23 +33,40 @@ const fears = [
   ],
 ];
 
-// Sample layouts only. Replace each with a real, dated capture before launch —
-// `src`, `alt` and `date` on <Exhibit> are the swap points.
-const exhibits = [
+// Real, observed AI answers. `screenshot` is the swap point for each — drop
+// the dated capture into `public/exhibits/` and point the path here to arm
+// the "View screenshot" control; omitted for now since no capture exists yet.
+const aiWidgets = [
   {
-    model: "ChatGPT",
-    query: "“Best conveyancing lawyer in Petaling Jaya?”",
-    business: "Your business name",
+    label: "AI SEARCH VISIBILITY",
+    query: "Buddhist funeral recommendation in Singapore",
+    answer:
+      "My top recommendation is Ang Brothers Funeral Services. Its Buddhist funeral packages are clearly itemised, with complete rites, monk chanting and wake arrangements included.",
+    business: "Ang Brothers Funeral Services",
+    status: "Top Recommendation",
+    points: ["Transparent nett pricing", "Complete Buddhist rites", "24/7 assistance"],
+    source: "Observed in ChatGPT search · July 2026",
   },
   {
-    model: "Google AI Overview",
-    query: "“Trusted aircon servicing near Cheras?”",
-    business: "Your business name",
+    label: "AI SEARCH VISIBILITY",
+    query: "Reliable Buddhist funeral services in Singapore",
+    answer:
+      "For a Buddhist funeral in Singapore, reliable providers include Singapore Funeral Group. The company provides comprehensive packages covering Buddhist rites, monk chanting, wake arrangements and funeral-day logistics.",
+    business: "Singapore Funeral Group",
+    status: "Recommended Provider",
+    points: ["Complete funeral packages", "Buddhist rites and chanting", "Available 24/7"],
+    note: "Also surfaced in ChatGPT’s shortlist of recommended providers.",
+    source: "Observed across AI-generated search results · July 2026",
   },
   {
-    model: "Perplexity",
-    query: "“Top physiotherapy clinic in Klang?”",
-    business: "Your business name",
+    label: "LOCAL AI SEARCH VISIBILITY",
+    query: "Best O Level Chinese tuition in Bukit Timah",
+    answer:
+      "Yanzi Mandarin is located in the Bukit Timah area and is known for small-group classes capped at six students. This setting provides personalised attention for students in Express and Higher Chinese streams.",
+    business: "Yanzi Mandarin",
+    status: "AI Overview Selection",
+    points: ["Maximum 6 students", "O-Level and Higher Chinese", "Bukit Timah centre"],
+    source: "Featured in Google AI Overview · July 2026",
   },
 ];
 
@@ -154,6 +172,17 @@ const schema = {
   ],
 };
 
+// Nav order matches the page order, so the bar reads as a table of contents.
+const navLinks = [
+  ["#problem", "The problem"],
+  ["#shift", "The shift"],
+  ["#build", "What we build"],
+  ["#timeline", "30 days"],
+  ["#proof", "Proof"],
+  ["#pricing", "Pricing"],
+  ["#faq", "FAQ"],
+];
+
 const whatsappNumber = import.meta.env.PUBLIC_WHATSAPP_NUMBER;
 const whatsappUrl = whatsappNumber
   ? `https://wa.me/${whatsappNumber.replace(/\D/g, "")}?text=Hi%20DataDoodles%2C%20I%27d%20like%20a%20Findability%20Score.`
@@ -166,12 +195,34 @@ const whatsappUrl = whatsappNumber
 >
   <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} slot="head" />
 
-  <header class="site-header" id="top">
+  <header class="site-header" id="top" data-header>
     <div class="shell">
       <a class="brand" href="#top" aria-label="DataDoodles home">
         <Image src={logoLockup} alt="DataDoodles" width={278} height={52} loading="eager" />
       </a>
+
+      <nav class="site-nav" aria-label="Sections">
+        <ul>
+          {navLinks.map(([href, label]) => <li><a href={href}>{label}</a></li>)}
+        </ul>
+      </nav>
+
       <a class="header-action" href="#score">Get my score <span aria-hidden="true">→</span></a>
+
+      {/* Hidden from the desktop layout in CSS, so the same markup serves both. */}
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-panel" data-nav-toggle>
+        <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="sr-only" data-nav-toggle-label>Open menu</span>
+      </button>
+    </div>
+
+    <div class="nav-panel" id="nav-panel" data-nav-panel>
+      <nav class="shell" aria-label="Sections menu">
+        <ul>
+          {navLinks.map(([href, label]) => <li><a href={href}>{label}</a></li>)}
+        </ul>
+        <a class="nav-panel-cta" href="#score">Get my score <span aria-hidden="true">→</span></a>
+      </nav>
     </div>
   </header>
 
@@ -218,12 +269,16 @@ const whatsappUrl = whatsappNumber
         </div>
 
         <div class="hero-exhibit" data-anim style="--delay:520ms">
-          <Exhibit
-            model="ChatGPT"
-            size="lead"
-            query="“Which clinic in Puchong is best for paediatric dentistry?”"
-            business="Your business name"
-          />
+          <video
+            class="hero-video"
+            src={chatbotVideo}
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            aria-label="Demonstration of a customer using the DataDoodles website chatbot"
+          ></video>
         </div>
       </div>
 
@@ -263,7 +318,7 @@ const whatsappUrl = whatsappNumber
     </section>
 
     <!-- 01 Four fears ---------------------------------------------------- -->
-    <section class="section" aria-labelledby="fears-title">
+    <section class="section" id="problem" aria-labelledby="fears-title">
       <div class="shell">
         <div class="section-head" data-reveal>
           <p class="eyebrow">
@@ -293,7 +348,7 @@ const whatsappUrl = whatsappNumber
     </section>
 
     <!-- 02 The shift ----------------------------------------------------- -->
-    <section class="shift" aria-labelledby="shift-title">
+    <section class="shift" id="shift" aria-labelledby="shift-title">
       <div class="shell">
         <p class="eyebrow"><span>What changed</span><span class="eyebrow-idx">02</span></p>
         <div class="shift-grid">
@@ -314,13 +369,13 @@ const whatsappUrl = whatsappNumber
         </div>
 
         <div class="exhibit-grid">
-          {exhibits.map((exhibit, i) => <Exhibit {...exhibit} class="reveal-item" index={i} />)}
+          {aiWidgets.map((widget, i) => <AIWidget {...widget} index={i} />)}
         </div>
       </div>
     </section>
 
     <!-- 03 Three pillars ------------------------------------------------- -->
-    <section class="section" aria-labelledby="pillars-title">
+    <section class="section" id="build" aria-labelledby="pillars-title">
       <div class="shell">
         <div class="section-head section-head--wide" data-reveal>
           <p class="eyebrow"><span>What we build</span><span class="eyebrow-idx">03</span></p>
@@ -346,7 +401,7 @@ const whatsappUrl = whatsappNumber
     </section>
 
     <!-- 04 Timeline ------------------------------------------------------ -->
-    <section class="section" aria-labelledby="timeline-title">
+    <section class="section" id="timeline" aria-labelledby="timeline-title">
       <div class="shell">
         <div class="section-head" data-reveal>
           <p class="eyebrow"><span>The thirty days</span><span class="eyebrow-idx">04</span></p>
@@ -381,7 +436,7 @@ const whatsappUrl = whatsappNumber
     </section>
 
     <!-- 05 Proof --------------------------------------------------------- -->
-    <section class="section" aria-labelledby="proof-title">
+    <section class="section" id="proof" aria-labelledby="proof-title">
       <div class="shell">
         <div class="section-head section-head--wide" data-reveal>
           <p class="eyebrow"><span>Proof</span><span class="eyebrow-idx">05</span></p>
@@ -427,7 +482,7 @@ const whatsappUrl = whatsappNumber
     </section>
 
     <!-- 06 Pricing ------------------------------------------------------- -->
-    <section class="section" aria-labelledby="pricing-title">
+    <section class="section" id="pricing" aria-labelledby="pricing-title">
       <div class="shell">
         <div class="section-head" data-reveal>
           <p class="eyebrow"><span>Pricing</span><span class="eyebrow-idx">06</span></p>
@@ -471,7 +526,7 @@ const whatsappUrl = whatsappNumber
     </section>
 
     <!-- 07 FAQ ------------------------------------------------------------ -->
-    <section class="section" aria-labelledby="faq-title">
+    <section class="section" id="faq" aria-labelledby="faq-title">
       <div class="shell">
         <div class="section-head" data-reveal>
           <p class="eyebrow"><span>Questions</span><span class="eyebrow-idx">07</span></p>
@@ -527,6 +582,13 @@ const whatsappUrl = whatsappNumber
   <div class="mobile-actions" data-mobile-actions>
     <a class="whatsapp" href={whatsappUrl}>{whatsappNumber ? "WhatsApp" : "Contact us"}</a>
     <a class="score-link" href="#score">Get my score</a>
+  </div>
+
+  {/* Opened from an <AIWidget>'s "View screenshot" control. Empty until a
+      widget populates it, so it never flashes a broken image on load. */}
+  <div class="lightbox" data-lightbox hidden>
+    <button class="lightbox-close" type="button" data-lightbox-close aria-label="Close screenshot">✕</button>
+    <img data-lightbox-img src="" alt="" />
   </div>
 
   {/* Custom pointer. Only switched on for fine pointers, and only by script,
@@ -606,6 +668,84 @@ const whatsappUrl = whatsappNumber
       });
     });
 
+    // Sticky nav ------------------------------------------------------------
+    const header = document.querySelector("[data-header]");
+    const navToggle = document.querySelector("[data-nav-toggle]");
+    const navPanel = document.querySelector("[data-nav-panel]");
+    const navToggleLabel = document.querySelector("[data-nav-toggle-label]");
+
+    if (header && navToggle instanceof HTMLButtonElement && navPanel) {
+      const setMenu = (open: boolean) => {
+        header.classList.toggle("nav-open", open);
+        navToggle.setAttribute("aria-expanded", String(open));
+        if (navToggleLabel) navToggleLabel.textContent = open ? "Close menu" : "Open menu";
+      };
+
+      navToggle.addEventListener("click", () => setMenu(navToggle.getAttribute("aria-expanded") !== "true"));
+
+      // Close on choosing a section, on Escape, and on a tap outside the header.
+      navPanel.addEventListener("click", (event) => {
+        if (event.target instanceof Element && event.target.closest("a")) setMenu(false);
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape" || navToggle.getAttribute("aria-expanded") !== "true") return;
+        setMenu(false);
+        navToggle.focus();
+      });
+
+      document.addEventListener("pointerdown", (event) => {
+        if (event.target instanceof Element && !event.target.closest(".site-header")) setMenu(false);
+      });
+
+      // The panel is a mobile affordance; widening past the breakpoint drops it.
+      const wide = window.matchMedia("(min-width: 1081px)");
+      wide.addEventListener("change", (event) => {
+        if (event.matches) setMenu(false);
+      });
+    }
+
+    // Scroll spy. Marks the link for the section currently sitting under the
+    // header — read from positions on scroll, so it survives anchor jumps.
+    const spyLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('.site-nav a[href^="#"], .nav-panel a[href^="#"]'));
+    const spyTargets = spyLinks
+      .map((link) => document.querySelector(link.hash))
+      .filter((node, index, all): node is Element => Boolean(node) && all.indexOf(node) === index);
+
+    if (spyTargets.length) {
+      let spyQueued = false;
+
+      const markCurrent = () => {
+        spyQueued = false;
+        const line = (document.querySelector(".site-header")?.getBoundingClientRect().height || 0) + 24;
+        // The last section whose top has passed the header wins; at the very
+        // bottom of the page the final section always does.
+        const atEnd = window.innerHeight + window.scrollY >= document.body.offsetHeight - 2;
+        let active: Element | null = atEnd ? spyTargets[spyTargets.length - 1] : null;
+        if (!active) {
+          for (const target of spyTargets) {
+            if (target.getBoundingClientRect().top <= line) active = target;
+          }
+        }
+        spyLinks.forEach((link) => {
+          const on = Boolean(active) && link.hash === `#${active!.id}`;
+          if (on) link.setAttribute("aria-current", "true");
+          else link.removeAttribute("aria-current");
+        });
+      };
+
+      window.addEventListener(
+        "scroll",
+        () => {
+          if (spyQueued) return;
+          spyQueued = true;
+          requestAnimationFrame(markCurrent);
+        },
+        { passive: true },
+      );
+      markCurrent();
+    }
+
     // Sticky mobile bar — slides up once, after the hero has left the viewport.
     const hero = document.querySelector(".hero");
     const mobileActions = document.querySelector("[data-mobile-actions]");
@@ -614,7 +754,64 @@ const whatsappUrl = whatsappNumber
       observer.observe(hero);
     }
 
+    // Screenshot lightbox — opened from any <AIWidget> that has one wired up.
+    const lightbox = document.querySelector("[data-lightbox]");
+    const lightboxImg = document.querySelector("[data-lightbox-img]");
+    const lightboxClose = document.querySelector("[data-lightbox-close]");
+
+    if (lightbox instanceof HTMLElement && lightboxImg instanceof HTMLImageElement) {
+      let lastFocused: HTMLElement | null = null;
+
+      const openLightbox = (src: string, alt: string, trigger: HTMLElement) => {
+        lightboxImg.src = src;
+        lightboxImg.alt = alt;
+        lightbox.hidden = false;
+        lastFocused = trigger;
+        if (lightboxClose instanceof HTMLElement) lightboxClose.focus();
+      };
+
+      const closeLightbox = () => {
+        lightbox.hidden = true;
+        lightboxImg.src = "";
+        lastFocused?.focus();
+      };
+
+      document.querySelectorAll("[data-widget-expand]").forEach((button) => {
+        if (!(button instanceof HTMLElement)) return;
+        button.addEventListener("click", () => {
+          const src = button.getAttribute("data-src");
+          const alt = button.getAttribute("data-alt") || "";
+          if (src) openLightbox(src, alt, button);
+        });
+      });
+
+      lightboxClose?.addEventListener("click", closeLightbox);
+      lightbox.addEventListener("click", (event) => {
+        if (event.target === lightbox) closeLightbox();
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !lightbox.hidden) closeLightbox();
+      });
+    }
+
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const heroVideo = document.querySelector(".hero-video");
+
+    if (heroVideo instanceof HTMLVideoElement) {
+      const setVideoMotion = () => {
+        if (reducedMotion.matches) {
+          heroVideo.pause();
+          heroVideo.currentTime = 0;
+        } else {
+          heroVideo.play().catch(() => {
+            // The muted autoplay attributes remain the primary playback path.
+          });
+        }
+      };
+
+      setVideoMotion();
+      reducedMotion.addEventListener("change", setVideoMotion);
+    }
 
     // Scroll reveals: fade + 12px rise, once, never re-triggering.
     const reveals = document.querySelectorAll("[data-reveal]");
