@@ -1,0 +1,511 @@
+---
+const question = "Which clinic in Puchong is best for paediatric dentistry?";
+---
+
+<figure
+  class="geo-simulator"
+  data-geo-simulator
+  aria-label="Illustrative AI search recommendation generated for a paediatric dentistry query in Puchong"
+>
+  <header class="geo-simulator__header">
+    <h2>AI Overview</h2>
+  </header>
+
+  <section class="geo-simulator__conversation" aria-label="AI search conversation">
+    <p class="geo-simulator__question" data-geo-bubble>{question}</p>
+
+    <div class="geo-simulator__processing" data-geo-processing aria-hidden="true">
+      <span></span><span></span><span></span>
+    </div>
+
+    <div class="geo-simulator__response">
+      <p>
+        <span data-geo-response>
+          When looking for the best paediatric dental care in Puchong,
+        </span>
+        <span data-geo-response>
+          there is a mix of specialist clinics and family-oriented practices that go out of their way to make children
+          feel comfortable.
+        </span>
+        <span data-geo-response>Here are the top recommendations:</span>
+      </p>
+    </div>
+
+    <ol class="geo-simulator__recommendations">
+      <li class="geo-simulator__recommendation geo-simulator__recommendation--primary" data-geo-recommendation="primary">
+        <span class="geo-simulator__number">1.</span>
+        <span class="geo-simulator__business">Your Business</span>
+        <span class="geo-simulator__recommended" data-geo-recommended>RECOMMENDED</span>
+      </li>
+      <li class="geo-simulator__recommendation" data-geo-recommendation="secondary">
+        <span class="geo-simulator__number">2.</span>
+        <span>Competitor 1</span>
+      </li>
+      <li class="geo-simulator__recommendation" data-geo-recommendation="secondary">
+        <span class="geo-simulator__number">3.</span>
+        <span>Competitor 2</span>
+      </li>
+    </ol>
+
+    <div class="geo-simulator__composer" aria-hidden="true">
+      <div class="geo-simulator__field">
+        <span class="geo-simulator__placeholder" data-geo-placeholder>Ask anything</span>
+        <span class="geo-simulator__field-line">
+          <span data-geo-typed data-question={question}></span><span
+            class="geo-simulator__cursor"
+            data-geo-cursor
+          ></span>
+        </span>
+      </div>
+      <span class="geo-simulator__send" data-geo-send>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+          <path
+            d="M12 19V5M12 5l-6 6M12 5l6 6"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path>
+        </svg>
+      </span>
+    </div>
+  </section>
+</figure>
+
+<script>
+  const DURATION = 10_000;
+  const TYPE_START = 400;
+  const TYPE_DURATION = 2_600;
+  const SEND_AT = 3_200;
+  const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
+  const progress = (elapsed: number, start: number, duration: number) => clamp((elapsed - start) / duration);
+  const easeOut = (value: number) => 1 - Math.pow(1 - value, 3);
+
+  document.querySelectorAll<HTMLElement>("[data-geo-simulator]:not([data-geo-ready])").forEach((simulator) => {
+    const bubble = simulator.querySelector<HTMLElement>("[data-geo-bubble]");
+    const typed = simulator.querySelector<HTMLElement>("[data-geo-typed]");
+    const placeholder = simulator.querySelector<HTMLElement>("[data-geo-placeholder]");
+    const send = simulator.querySelector<HTMLElement>("[data-geo-send]");
+    const cursor = simulator.querySelector<HTMLElement>("[data-geo-cursor]");
+    const processing = simulator.querySelector<HTMLElement>("[data-geo-processing]");
+    const dots = Array.from(processing?.querySelectorAll<HTMLElement>("span") ?? []);
+    const responseGroups = Array.from(simulator.querySelectorAll<HTMLElement>("[data-geo-response]"));
+    const primary = simulator.querySelector<HTMLElement>('[data-geo-recommendation="primary"]');
+    const secondary = Array.from(simulator.querySelectorAll<HTMLElement>('[data-geo-recommendation="secondary"]'));
+    const recommended = simulator.querySelector<HTMLElement>("[data-geo-recommended]");
+    const completeQuestion = typed?.dataset.question ?? "";
+
+    if (!bubble || !typed || !placeholder || !send || !cursor || !processing || !primary || !recommended) return;
+
+    let frame = 0;
+    let startedAt = 0;
+    let visible = false;
+    let destroyed = false;
+
+    const setOpacity = (element: HTMLElement | SVGElement, value: number) => {
+      element.style.opacity = String(clamp(value));
+    };
+
+    const setRevealX = (element: HTMLElement, value: number, distance = -6) => {
+      const eased = easeOut(clamp(value));
+      setOpacity(element, eased);
+      element.style.transform = `translateX(${(1 - eased) * distance}px)`;
+    };
+
+    const renderComplete = () => {
+      simulator.style.opacity = "1";
+      typed.textContent = "";
+      setOpacity(placeholder, 1);
+      setOpacity(cursor, 0);
+      send.style.transform = "none";
+      setOpacity(bubble, 1);
+      bubble.style.transform = "none";
+      setOpacity(processing, 0);
+      responseGroups.forEach((group) => {
+        setOpacity(group, 1);
+        group.style.transform = "none";
+      });
+      setOpacity(primary, 1);
+      primary.style.transform = "none";
+      secondary.forEach((item) => {
+        setOpacity(item, 1);
+        item.style.transform = "none";
+      });
+      setOpacity(recommended, 1);
+      recommended.style.transform = "none";
+      dots.forEach((dot) => {
+        dot.style.opacity = "0";
+        dot.style.transform = "none";
+      });
+    };
+
+    const render = (elapsed: number) => {
+      const fadeOut = elapsed >= 9_200 ? 1 - progress(elapsed, 9_200, 800) : 1;
+
+      simulator.style.opacity = String(0.95 + progress(elapsed, 0, 400) * 0.05);
+
+      // Composer: type the query in, then clear it the moment send fires.
+      const typeProgress = progress(elapsed, TYPE_START, TYPE_DURATION);
+      const sent = elapsed >= SEND_AT;
+      typed.textContent = sent ? "" : completeQuestion.slice(0, Math.floor(typeProgress * completeQuestion.length));
+      setOpacity(typed, fadeOut);
+
+      const placeholderOut = progress(elapsed, TYPE_START - 60, 150);
+      const placeholderBack = sent ? progress(elapsed, SEND_AT + 120, 220) : 0;
+      setOpacity(placeholder, Math.max(1 - placeholderOut, placeholderBack) * fadeOut);
+
+      const cursorActive = elapsed >= TYPE_START && !sent;
+      const cursorBlink = Math.floor((elapsed - TYPE_START) / 300) % 2 === 0;
+      setOpacity(cursor, cursorActive && cursorBlink ? fadeOut : 0);
+
+      // Send button: brief press, only at the hand-off moment.
+      const press = progress(elapsed, SEND_AT - 40, 90) - progress(elapsed, SEND_AT + 50, 160);
+      send.style.transform = `scale(${1 - clamp(press) * 0.12})`;
+      setOpacity(send, (0.55 + clamp(typeProgress) * 0.45) * fadeOut);
+
+      // Bubble: the sent message lands above the composer.
+      const bubbleIn = easeOut(progress(elapsed, SEND_AT + 40, 240));
+      setOpacity(bubble, bubbleIn * fadeOut);
+      bubble.style.transform = `translateY(${(1 - bubbleIn) * 10}px) scale(${0.97 + bubbleIn * 0.03})`;
+
+      const processingActive = elapsed >= 3_560 && elapsed < 4_160;
+      setOpacity(processing, processingActive ? fadeOut : 0);
+      dots.forEach((dot, index) => {
+        const rise = progress(elapsed, 3_560 + index * 100, 180);
+        const depart = elapsed > 3_980 + index * 50 ? 1 - progress(elapsed, 3_980 + index * 50, 130) : 1;
+        const dotOpacity = processingActive ? rise * depart * fadeOut : 0;
+        dot.style.opacity = String(dotOpacity);
+        dot.style.transform = `translateY(${(1 - rise) * 2}px)`;
+      });
+
+      const responseStarts = [4_160, 4_760, 5_360];
+      responseGroups.forEach((group, index) => {
+        const value = progress(elapsed, responseStarts[index], 450);
+        setRevealX(group, value * fadeOut);
+      });
+
+      const primaryReveal = progress(elapsed, 6_100, 300);
+      setRevealX(primary, primaryReveal * fadeOut);
+
+      const labelReveal = easeOut(progress(elapsed, 6_300, 300));
+      setOpacity(recommended, labelReveal * fadeOut);
+      recommended.style.transform = `translateX(${(1 - labelReveal) * -6}px)`;
+
+      const secondaryStarts = [6_700, 7_000];
+      secondary.forEach((item, index) => {
+        const value = progress(elapsed, secondaryStarts[index], 300);
+        setRevealX(item, value * fadeOut);
+      });
+    };
+
+    const stop = () => {
+      if (frame) cancelAnimationFrame(frame);
+      frame = 0;
+    };
+
+    const tick = (now: number) => {
+      if (destroyed || !simulator.isConnected) {
+        destroy();
+        return;
+      }
+      render((now - startedAt) % DURATION);
+      frame = requestAnimationFrame(tick);
+    };
+
+    const start = () => {
+      stop();
+      simulator.dataset.animated = "true";
+      render(0);
+      startedAt = performance.now();
+      frame = requestAnimationFrame(tick);
+    };
+
+    const applyMotionPreference = () => {
+      stop();
+      if (motionPreference.matches) {
+        delete simulator.dataset.animated;
+        simulator.dataset.static = "true";
+        renderComplete();
+      } else {
+        delete simulator.dataset.static;
+        if (visible) start();
+        else render(0);
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        if (motionPreference.matches) {
+          renderComplete();
+        } else if (visible) {
+          start();
+        } else {
+          stop();
+          render(0);
+        }
+      },
+      { threshold: 0.12 },
+    );
+
+    const destroy = () => {
+      if (destroyed) return;
+      destroyed = true;
+      stop();
+      observer.disconnect();
+      removalObserver.disconnect();
+      motionPreference.removeEventListener("change", applyMotionPreference);
+    };
+
+    const removalObserver = new MutationObserver(() => {
+      if (!simulator.isConnected) destroy();
+    });
+
+    observer.observe(simulator);
+    removalObserver.observe(document.documentElement, { childList: true, subtree: true });
+    motionPreference.addEventListener("change", applyMotionPreference);
+    applyMotionPreference();
+    simulator.dataset.geoReady = "true";
+  });
+</script>
+
+<style>
+  .geo-simulator {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    width: 100%;
+    min-height: 560px;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    color: var(--ink-body);
+  }
+
+  .geo-simulator__header {
+    display: grid;
+    place-items: center;
+    align-items: center;
+    min-height: 56px;
+    padding: var(--s1) var(--s3);
+    border-bottom: 1px solid var(--rule-light);
+  }
+
+  .geo-simulator__header h2 {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  .geo-simulator__conversation {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: var(--s4) var(--s5);
+    background: var(--surface-low);
+  }
+
+  .geo-simulator__question {
+    align-self: flex-end;
+    width: min(86%, 34ch);
+    padding: 20px 24px;
+    background: var(--surface);
+    border: 1px solid var(--rule-light);
+    border-radius: 20px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+    font-weight: 600;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+    text-align: left;
+    transform-origin: 100% 100%;
+  }
+
+  .geo-simulator__processing {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 18px;
+    margin-top: var(--s3);
+  }
+
+  .geo-simulator__processing span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--outline);
+  }
+
+  .geo-simulator__response {
+    margin-top: var(--s2);
+    color: var(--ink-body);
+    font-size: 1rem;
+    line-height: 1.52;
+  }
+
+  .geo-simulator__response [data-geo-response] {
+    display: block;
+  }
+
+  .geo-simulator__response [data-geo-response] + [data-geo-response] {
+    margin-top: var(--s1);
+  }
+
+  .geo-simulator__recommendations {
+    display: grid;
+    gap: 10px;
+    padding: 0;
+    margin: var(--s3) 0 var(--s4);
+    list-style: none;
+  }
+
+  .geo-simulator__recommendation {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.45;
+  }
+
+  .geo-simulator__recommendation--primary {
+    flex-wrap: wrap;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .geo-simulator__number {
+    flex: 0 0 25px;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .geo-simulator__business {
+    color: var(--signal-deep);
+  }
+
+  .geo-simulator__recommended {
+    color: var(--signal-deep);
+    font: 500 0.6875rem/1.4 var(--font-mono);
+    letter-spacing: 0.06em;
+  }
+
+  .geo-simulator__composer {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    margin-top: auto;
+    padding: 10px 10px 10px 18px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 24px;
+  }
+
+  .geo-simulator__field {
+    display: grid;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 1.5em;
+    padding: 7px 0;
+    color: var(--ink);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .geo-simulator__field > * {
+    grid-area: 1 / 1;
+    min-width: 0;
+  }
+
+  .geo-simulator__placeholder {
+    color: var(--data-gray);
+  }
+
+  .geo-simulator__cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1.05em;
+    margin-left: 2px;
+    background: var(--ink);
+    vertical-align: -0.16em;
+  }
+
+  .geo-simulator__send {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  :global(html.js) .geo-simulator:not([data-geo-ready]) [data-geo-bubble],
+  :global(html.js) .geo-simulator:not([data-geo-ready]) .geo-simulator__processing,
+  :global(html.js) .geo-simulator:not([data-geo-ready]) [data-geo-response],
+  :global(html.js) .geo-simulator:not([data-geo-ready]) .geo-simulator__recommendation {
+    opacity: 0;
+  }
+
+  @media (max-width: 1080px) {
+    .geo-simulator {
+      min-height: 580px;
+    }
+
+    .geo-simulator__conversation {
+      padding-inline: var(--s4);
+    }
+  }
+
+  @media (max-width: 720px) {
+    .geo-simulator {
+      min-height: 690px;
+    }
+
+    .geo-simulator__header {
+      min-height: 52px;
+      padding-inline: var(--s2);
+    }
+
+    .geo-simulator__conversation {
+      padding: var(--s3) var(--s2);
+    }
+
+    .geo-simulator__question {
+      width: 92%;
+      padding: 18px 20px;
+      font-size: clamp(1.25rem, 6vw, 1.5rem);
+    }
+
+    .geo-simulator__response,
+    .geo-simulator__recommendation {
+      font-size: 1rem;
+    }
+
+    .geo-simulator__recommended {
+      flex-basis: 100%;
+      margin-left: 35px;
+    }
+
+    .geo-simulator__composer {
+      padding-left: 14px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .geo-simulator,
+    .geo-simulator *,
+    .geo-simulator *::before,
+    .geo-simulator *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+</style>

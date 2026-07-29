@@ -46,6 +46,7 @@ Alignment rules:
 - Lead form: white, 1px border, 4px corners, no shadow; 52px inputs and 56px primary action; focus thickens the border to Signal Red.
 - Buttons: square-ended 4px corners, solid fills, strong focus rings, no decorative shadows.
 - Evidence exhibits: 1px borders with mono model/date bars and captions. The recommended business is marked with a bordered Signal Red tag inside the answer flow — never an overlay, so nothing can obscure text. Sample layouts are labelled as such; only real, dated screenshots may replace them.
+- GEO chat simulator: a native HTML/CSS evidence interface in the hero. A right-side white chat bubble types near the bottom, moves into its reserved top position, and is followed by left-originating AI response groups and recommendations beneath a single centred “AI Overview” title. “Your Business” aligns with the other results and uses Signal Red instead of an outline. One 10-second elapsed-time controller runs and resets the conversation while the fixed card frame remains visible. It restarts on viewport re-entry and becomes a static completed result under reduced motion.
 - FAQ: native disclosure rows separated by rules, chevron rotates in 200ms.
 - Timeline: a 1px horizontal axis with Deep Onyx nodes, becoming a vertical axis under 720px.
 - Sticky mobile actions: appears after the hero and reserves page space so it never covers content.

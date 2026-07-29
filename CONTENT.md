@@ -107,11 +107,17 @@ Free Findability Score
 
 See who gets recommended instead of you.
 
-### Hero chatbot video
+### Hero GEO chat simulator
 
-The hero uses a silent, autoplaying, looping chatbot demonstration video. It has no visible interface copy outside the video itself.
-
-- Accessibility label: Demonstration of a customer using the DataDoodles website chatbot
+- Title: AI Overview
+- Question: Which clinic in Puchong is best for paediatric dentistry?
+- Response group 1: When looking for the best paediatric dental care in Puchong,
+- Response group 2: there is a mix of specialist clinics and family-oriented practices that go out of their way to make children feel comfortable.
+- Response group 3: Here are the top recommendations:
+- Recommendation 1: Your Business
+- Recommendation 1 label: RECOMMENDED
+- Recommendation 2: Competitor 1
+- Recommendation 3: Competitor 2
 
 ### Hero marquee — large row
 

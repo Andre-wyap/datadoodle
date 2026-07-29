@@ -3,8 +3,8 @@ import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import LeadForm from "../components/LeadForm.astro";
 import AIWidget from "../components/AIWidget.astro";
+import GeoChatSimulator from "../components/GeoChatSimulator.astro";
 import logoLockup from "../assets/logo-lockup.png";
-import chatbotVideo from "../../Chatbot_simulation_for_website_202607291507.mp4?url";
 
 const ticks = ["Remove trust friction", "Generate quality leads", "Easier to close for sales people"];
 
@@ -269,16 +269,7 @@ const whatsappUrl = whatsappNumber
         </div>
 
         <div class="hero-exhibit" data-anim style="--delay:520ms">
-          <video
-            class="hero-video"
-            src={chatbotVideo}
-            autoplay
-            muted
-            loop
-            playsinline
-            preload="metadata"
-            aria-label="Demonstration of a customer using the DataDoodles website chatbot"
-          ></video>
+          <GeoChatSimulator />
         </div>
       </div>
 
@@ -795,24 +786,6 @@ const whatsappUrl = whatsappNumber
     }
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const heroVideo = document.querySelector(".hero-video");
-
-    if (heroVideo instanceof HTMLVideoElement) {
-      const setVideoMotion = () => {
-        if (reducedMotion.matches) {
-          heroVideo.pause();
-          heroVideo.currentTime = 0;
-        } else {
-          heroVideo.play().catch(() => {
-            // The muted autoplay attributes remain the primary playback path.
-          });
-        }
-      };
-
-      setVideoMotion();
-      reducedMotion.addEventListener("change", setVideoMotion);
-    }
-
     // Scroll reveals: fade + 12px rise, once, never re-triggering.
     const reveals = document.querySelectorAll("[data-reveal]");
     if (reducedMotion.matches) {

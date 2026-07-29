@@ -562,17 +562,6 @@ main [id],
   margin-top: var(--s10);
 }
 
-.hero-video {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  background: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: 4px;
-}
-
 /* Marquee: the hero's closing band and the divider into the next section.
    Two rows running against each other — disciplines over promises. */
 .marquee {
