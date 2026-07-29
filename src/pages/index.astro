@@ -1,0 +1,656 @@
+---
+import { Image } from "astro:assets";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import LeadForm from "../components/LeadForm.astro";
+import Exhibit from "../components/Exhibit.astro";
+import logoLockup from "../assets/logo-lockup.png";
+
+const ticks = ["Remove trust friction", "Generate quality leads", "Easier to close for sales people"];
+
+const fears = [
+  [
+    "They didn’t know what you actually do.",
+    "Someone landed on your homepage. Ten seconds later they left, still unsure whether you were the right fit for their exact problem. They didn’t ask. They just went back to Google.",
+  ],
+  [
+    "They couldn’t tell if you were any good.",
+    "No case studies. No real faces. No numbers. Just words claiming you’re professional and trusted. So they picked the competitor who showed them instead of telling them.",
+  ],
+  [
+    "They never found you in the first place.",
+    "They asked ChatGPT for the best options in their area. They searched Google Maps. Your business exists — but the search engines and AI models couldn’t understand you well enough to recommend you. Someone else got named.",
+  ],
+  [
+    "They wanted to contact you and gave up.",
+    "The form asked for nine fields. The WhatsApp button was buried at the bottom. Nobody replied for two days. They were ready to buy, and the friction cost you the sale.",
+  ],
+];
+
+// Sample layouts only. Replace each with a real, dated capture before launch —
+// `src`, `alt` and `date` on <Exhibit> are the swap points.
+const exhibits = [
+  {
+    model: "ChatGPT",
+    query: "“Best conveyancing lawyer in Petaling Jaya?”",
+    business: "Your business name",
+  },
+  {
+    model: "Google AI Overview",
+    query: "“Trusted aircon servicing near Cheras?”",
+    business: "Your business name",
+  },
+  {
+    model: "Perplexity",
+    query: "“Top physiotherapy clinic in Klang?”",
+    business: "Your business name",
+  },
+];
+
+const pillars = [
+  [
+    "Easy to find",
+    [
+      "Your visibility mapped across Google, ChatGPT, Perplexity and AI Overviews — against three named competitors.",
+      "Our in-house AI keyword planner turns that into a topic map, and the topic map becomes your actual site structure.",
+      "Schema and entity setup so machines know who you are.",
+      "Google Business Profile aligned.",
+      "Built to be cited, not just crawled.",
+    ],
+  ],
+  [
+    "Easy to trust",
+    [
+      "Case studies with real numbers.",
+      "Your team’s actual faces.",
+      "Licences and credentials where buyers look for them.",
+      "Live Google reviews.",
+      "An FAQ built from the objections your salespeople hear every week.",
+      "A pricing signal — because silence on price loses more deals than a high price ever will.",
+    ],
+  ],
+  [
+    "Easy to contact",
+    [
+      "WhatsApp-first, one tap, pre-filled message, on every section.",
+      "Maximum four form fields.",
+      "A response-time promise you can keep.",
+      "Every lead tagged by the page it came from, routed into your CRM.",
+      "Full tracking, so you finally know what’s working.",
+    ],
+  ],
+];
+
+const timeline = [
+  ["Week 00", "Findability Audit delivered. 90-minute kickoff."],
+  ["Week 01", "Topic map, sitemap and wireframes approved."],
+  ["Week 02", "Design and copy across all pages."],
+  ["Week 03", "Build, schema, integrations, tracking."],
+  ["Week 04", "QA, launch, handover training."],
+];
+
+const pricing = [
+  [
+    "Findability Audit",
+    "RM980",
+    "",
+    "Where you stand in Google and AI search versus three competitors, plus the exact gaps costing you leads. Fully credited if you proceed to the build.",
+  ],
+  [
+    "The 30-Day Findable Site",
+    "RM14,800",
+    "",
+    "Everything above. Up to 10 pages. Paid across three milestones.",
+  ],
+  [
+    "Findability Retainer",
+    "RM3,200",
+    "/month",
+    "Monthly content from your topic map, AI citation monitoring, schema maintenance, conversion reporting. Six-month minimum. Optional — but this is where compounding happens.",
+  ],
+];
+
+const faqs = [
+  ["Do I need to rewrite all my content?", "No. We audit what you have, keep what works, and rebuild what doesn’t map to your topic plan."],
+  ["I already pay for SEO. Is this different?", "Yes. Traditional SEO optimises for ranking positions. We build for citation — being the business an AI model names when someone asks for a recommendation. Related, but not the same job."],
+  ["Do you guarantee rankings?", "No, and be careful with anyone who does. Rankings depend on your market, competitors and time. What we guarantee is a site that’s structurally ready to be found, delivered in 30 days. Our case studies show what that’s produced so far."],
+  ["What happens after launch?", "You own everything — domain, hosting, content, code. The retainer is optional."],
+  ["Why 30 days?", "Because scope creep kills websites. A fixed window forces decisions, and a site that launches in 30 days starts earning before a “perfect” one ever goes live."],
+  ["Can you work in Bahasa Malaysia or Chinese?", "Yes — multilingual structure is part of the topic map where it makes commercial sense."],
+];
+
+const schema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["Organization", "LocalBusiness"],
+      "@id": "https://datadoodles.my/#organization",
+      name: "DataDoodles",
+      url: "https://datadoodles.my",
+      areaServed: { "@type": "AdministrativeArea", name: "Klang Valley, Malaysia" },
+      description: "DataDoodles rebuilds Malaysian SME websites for visibility in Google and AI search.",
+    },
+    {
+      "@type": "Service",
+      name: "The 30-Day Findable Site",
+      provider: { "@id": "https://datadoodles.my/#organization" },
+      areaServed: "Malaysia",
+      offers: { "@type": "Offer", price: "14800", priceCurrency: "MYR" },
+      audience: { "@type": "BusinessAudience", audienceType: "Established Malaysian SMEs" },
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: faqs.map(([name, text]) => ({
+        "@type": "Question",
+        name,
+        acceptedAnswer: { "@type": "Answer", text },
+      })),
+    },
+  ],
+};
+
+const whatsappNumber = import.meta.env.PUBLIC_WHATSAPP_NUMBER;
+const whatsappUrl = whatsappNumber
+  ? `https://wa.me/${whatsappNumber.replace(/\D/g, "")}?text=Hi%20DataDoodles%2C%20I%27d%20like%20a%20Findability%20Score.`
+  : "#score";
+---
+
+<BaseLayout
+  title="DataDoodles — Get found in Google and AI search"
+  description="We rebuild Malaysian SME websites so customers find you in Google and ChatGPT, trust you in 10 seconds, and reach you in one tap."
+>
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} slot="head" />
+
+  <header class="site-header" id="top">
+    <div class="shell">
+      <a class="brand" href="#top" aria-label="DataDoodles home">
+        <Image src={logoLockup} alt="DataDoodles" width={278} height={52} loading="eager" />
+      </a>
+      <a class="header-action" href="#score">Get my score <span aria-hidden="true">→</span></a>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero ------------------------------------------------------------- -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="shell">
+        <div class="hero-grid">
+          <div>
+            <p class="hero-kicker" data-anim>The 30-Day Findable Site</p>
+            {/* Words are split so the headline can rise in sequence on load.
+                Literal whitespace between the spans keeps normal wrapping. */}
+            <h1 id="hero-title">
+              <span class="w" style="--i:0">Your</span>
+              <span class="w" style="--i:1">competitors</span>
+              <span class="w" style="--i:2">are</span>
+              <span class="w" style="--i:3">not</span>
+              <span class="w" style="--i:4">always</span>
+              <span class="w" style="--i:5">better.</span>
+              <span class="w" style="--i:6">They</span>
+              <span class="w" style="--i:7">are</span>
+              <span class="w" style="--i:8">just</span>
+              <span class="hl">
+                <span class="w" style="--i:9">easier</span>
+                <span class="w" style="--i:10">to</span>
+                <span class="w" style="--i:11">choose</span>
+              </span>
+              <span class="w" style="--i:12">online.</span>
+            </h1>
+            <p class="hero-sub" data-anim style="--delay:300ms">
+              We rebuild websites so customers find you in Google and ChatGPT, trust you in 10 seconds, and reach you in
+              one tap. Live in 30 days.
+            </p>
+            <ul class="ticks" data-anim style="--delay:380ms">
+              {ticks.map((tick) => <li>{tick}</li>)}
+            </ul>
+          </div>
+
+          <div class="panel hero-panel" id="score" data-anim style="--delay:140ms">
+            <span class="panel-label">Free Findability Score</span>
+            <h2>See who gets recommended instead of you.</h2>
+            <LeadForm source="hero" />
+          </div>
+        </div>
+
+        <div class="hero-exhibit" data-anim style="--delay:520ms">
+          <Exhibit
+            model="ChatGPT"
+            size="lead"
+            query="“Which clinic in Puchong is best for paediatric dentistry?”"
+            business="Your business name"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- 01 Four fears ---------------------------------------------------- -->
+    <section class="section section--catch" aria-labelledby="fears-title">
+      <div class="shell">
+        <div class="section-head" data-reveal>
+          <p class="eyebrow">
+            <span>The cost of being hard to choose</span><span class="eyebrow-idx">01</span>
+          </p>
+          <h2 id="fears-title">Four ways you’re losing customers you never knew you had.</h2>
+        </div>
+
+        <div>
+          {
+            fears.map(([title, copy], index) => (
+              <article class="fear" data-reveal>
+                <p class="fear-number">{String(index + 1).padStart(2, "0")}</p>
+                <div>
+                  <h3>{title}</h3>
+                  <p>{copy}</p>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+
+        <div class="fear-close" data-reveal>
+          <p>None of these mean your service is worse. They mean you’re harder to choose.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 The shift ----------------------------------------------------- -->
+    <section class="shift" aria-labelledby="shift-title">
+      <div class="shell">
+        <p class="eyebrow"><span>What changed</span><span class="eyebrow-idx">02</span></p>
+        <div class="shift-grid">
+          <h2 id="shift-title">Search changed.<br />Your website didn’t.</h2>
+          <div class="shift-copy">
+            <p>
+              Your customers stopped typing keywords. They started asking questions — to ChatGPT, to Gemini, to the AI
+              Overview sitting above every Google result.
+            </p>
+            <p>These models don’t rank websites. They <em>recommend businesses.</em> One name, maybe three. No page two.</p>
+            <p>
+              To get recommended, an AI model has to understand exactly what you do, who you do it for, where you
+              operate, and whether anyone can verify it. Most Malaysian SME websites give it nothing to work with. Pretty
+              design, zero structure.
+            </p>
+            <p class="shift-close">That’s the gap we build for.</p>
+          </div>
+        </div>
+
+        <div class="exhibit-grid">
+          {exhibits.map((exhibit, i) => <Exhibit {...exhibit} class="reveal-item" index={i} />)}
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 Three pillars ------------------------------------------------- -->
+    <section class="section" aria-labelledby="pillars-title">
+      <div class="shell">
+        <div class="section-head section-head--wide" data-reveal>
+          <p class="eyebrow"><span>What we build</span><span class="eyebrow-idx">03</span></p>
+          <h2 id="pillars-title">Easy to find. Easy to trust. Easy to contact.</h2>
+          <p class="lede">Every page we build is judged against these three. Nothing else matters.</p>
+        </div>
+
+        <div class="col-grid pillar-grid">
+          {
+            pillars.map(([title, lines], i) => (
+              <article class="col pillar" data-reveal style={`--i:${i}`}>
+                <h3>{title}</h3>
+                <ul>
+                  {(lines as string[]).map((line) => (
+                    <li>{line}</li>
+                  ))}
+                </ul>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 Timeline ------------------------------------------------------ -->
+    <section class="section" aria-labelledby="timeline-title">
+      <div class="shell">
+        <div class="section-head" data-reveal>
+          <p class="eyebrow"><span>The thirty days</span><span class="eyebrow-idx">04</span></p>
+          <h2 id="timeline-title">Live in 30 days. Here’s exactly how.</h2>
+        </div>
+
+        <div class="timeline" data-reveal>
+          <ol>
+            {
+              timeline.map(([week, copy]) => (
+                <li>
+                  <span class="node" aria-hidden="true" />
+                  <p class="week">{week}</p>
+                  <p>{copy}</p>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+
+        <p class="time-note" data-reveal>
+          Your total time investment: <strong>three calls and two rounds of feedback.</strong>
+        </p>
+
+        <div class="guarantee" data-reveal>
+          <p>
+            <strong>Our guarantee:</strong> live in 30 days, or you don’t pay the final instalment. We guarantee our delivery
+            speed — not rankings. Anyone promising you page-one results by a fixed date is guessing.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 Proof --------------------------------------------------------- -->
+    <section class="section" aria-labelledby="proof-title">
+      <div class="shell">
+        <div class="section-head section-head--wide" data-reveal>
+          <p class="eyebrow"><span>Proof</span><span class="eyebrow-idx">05</span></p>
+          <h2 id="proof-title">What happened after.</h2>
+          <p class="lede">
+            Every figure below is published only once it has been verified against the client’s own analytics. Nothing
+            here is an estimate.
+          </p>
+        </div>
+
+        <div class="col-grid case-grid">
+          {
+            [0, 1, 2].map((i) => (
+              <article class="col case" data-reveal style={`--i:${i}`}>
+                <h3>Business type — Location</h3>
+                <dl>
+                  <div>
+                    <dt>Was</dt>
+                    <dd>Verified baseline required</dd>
+                  </div>
+                  <div>
+                    <dt>Built</dt>
+                    <dd>Verified scope required</dd>
+                  </div>
+                  <div>
+                    <dt>30 days</dt>
+                    <dd class="result" data-pending>
+                      Awaiting figure
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>90 days</dt>
+                    <dd class="result" data-pending>
+                      Awaiting figure
+                    </dd>
+                  </div>
+                </dl>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 Pricing ------------------------------------------------------- -->
+    <section class="section" aria-labelledby="pricing-title">
+      <div class="shell">
+        <div class="section-head" data-reveal>
+          <p class="eyebrow"><span>Pricing</span><span class="eyebrow-idx">06</span></p>
+          <h2 id="pricing-title">No quotes. No discovery-call ambush.</h2>
+        </div>
+
+        <div class="col-grid pricing-grid">
+          {
+            pricing.map(([name, price, unit, copy], i) => (
+              <article class="col tier" data-reveal style={`--i:${i}`}>
+                <h3>{name}</h3>
+                <p class="price">
+                  {price}
+                  {unit && <span>{unit}</span>}
+                </p>
+                <p>{copy}</p>
+              </article>
+            ))
+          }
+        </div>
+
+        <p class="pricing-note" data-reveal>
+          Published prices, in ringgit, before you speak to anyone. That is the whole point.
+        </p>
+      </div>
+    </section>
+
+    <!-- Disqualifier ------------------------------------------------------ -->
+    <section class="shell" aria-labelledby="fit-title">
+      <div class="disqualifier" data-reveal>
+        <h3 id="fit-title">This isn’t for everyone.</h3>
+        <p>
+          We’re not the right fit if you’re pre-revenue, need e-commerce or custom app development, want brand identity
+          and logo work, or are looking for the cheapest option available.
+        </p>
+        <p>
+          We work best with established businesses that already have customers and reviews — and a website that reflects
+          neither.
+        </p>
+      </div>
+    </section>
+
+    <!-- 07 FAQ ------------------------------------------------------------ -->
+    <section class="section" aria-labelledby="faq-title">
+      <div class="shell">
+        <div class="section-head" data-reveal>
+          <p class="eyebrow"><span>Questions</span><span class="eyebrow-idx">07</span></p>
+          <h2 id="faq-title">Questions worth asking.</h2>
+        </div>
+
+        <div class="faq" data-reveal>
+          {
+            faqs.map(([question, answer]) => (
+              <details>
+                <summary>
+                  {question}
+                  <span class="chev" aria-hidden="true" />
+                </summary>
+                <p>{answer}</p>
+              </details>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA --------------------------------------------------------- -->
+    <section class="final-cta" aria-labelledby="final-title">
+      <div class="shell">
+        <div class="final-grid">
+          <div data-reveal>
+            <h2 id="final-title">Find out how findable you actually are.</h2>
+            <p class="lede">
+              We’ll show you where you appear in Google and AI search, who’s appearing instead of you, and the three
+              fixes that matter most.
+            </p>
+          </div>
+          <div class="panel">
+            <span class="panel-label">Free Findability Score</span>
+            <LeadForm source="footer" />
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <a class="brand" href="#top" aria-label="DataDoodles home">
+        <Image src={logoLockup} alt="DataDoodles" width={278} height={52} loading="lazy" />
+      </a>
+      <p>Websites built to be found, trusted, and contacted.</p>
+      <p>© {new Date().getFullYear()} DataDoodles · Malaysia</p>
+    </div>
+  </footer>
+
+  <div class="mobile-actions" data-mobile-actions>
+    <a class="whatsapp" href={whatsappUrl}>{whatsappNumber ? "WhatsApp" : "Contact us"}</a>
+    <a class="score-link" href="#score">Get my score</a>
+  </div>
+
+  {/* Custom pointer. Only switched on for fine pointers, and only by script,
+      so the native cursor is never hidden without a replacement. */}
+  <div class="cursor-ring" data-cursor-ring aria-hidden="true"></div>
+  <div class="cursor-dot" data-cursor-dot aria-hidden="true"></div>
+
+  <script>
+    const mobilePattern = /^(?:\+?60|0)1[0-46-9]\d{7,8}$/;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const params = new URLSearchParams(window.location.search);
+
+    document.querySelectorAll("[data-lead-form]").forEach((form) => {
+      if (!(form instanceof HTMLFormElement)) return;
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const data = Object.fromEntries(new FormData(form));
+        const errors: Record<string, string> = {
+          name: String(data.name || "").trim().length >= 2 ? "" : "Enter your name.",
+          industry: data.industry ? "" : "Choose your industry.",
+          email: emailPattern.test(String(data.email || "").trim()) ? "" : "Enter a valid email address.",
+          mobile: mobilePattern.test(String(data.mobile || "").replace(/[\s-]/g, "")) ? "" : "Enter a valid Malaysian mobile number.",
+        };
+
+        form.querySelectorAll("[data-error-for]").forEach((node) => {
+          const field = node.getAttribute("data-error-for");
+          const message = field ? errors[field] : "";
+          node.textContent = message || "";
+          const input = field ? form.elements.namedItem(field) : null;
+          if (input instanceof HTMLElement) input.setAttribute("aria-invalid", message ? "true" : "false");
+        });
+
+        const firstError = Object.entries(errors).find(([, message]) => message);
+        if (firstError) {
+          const input = form.elements.namedItem(firstError[0]);
+          if (input instanceof HTMLElement) input.focus();
+          return;
+        }
+
+        const button = form.querySelector("button");
+        const label = form.querySelector("[data-button-label]");
+        const status = form.querySelector("[data-form-status]");
+        if (!(button instanceof HTMLButtonElement) || !label || !status) return;
+        button.disabled = true;
+        label.textContent = "Sending your details…";
+        status.textContent = "";
+
+        const payload = {
+          ...data,
+          referrer: document.referrer,
+          ...Object.fromEntries(["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"].map((key) => [key, params.get(key) || ""])),
+        };
+
+        try {
+          const response = await fetch("/api/lead", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) });
+          const result = await response.json();
+          if (!response.ok) throw result;
+          form.reset();
+          status.classList.add("success");
+          status.textContent = "Got it. Your Findability Score is on the way — check WhatsApp within 24 hours.";
+          label.textContent = "Score requested ✓";
+        } catch (error) {
+          const result = error;
+          if (result && typeof result === "object" && "field" in result) {
+            const errorNode = form.querySelector(`[data-error-for="${result.field}"]`);
+            if (errorNode) errorNode.textContent = "error" in result ? String(result.error || "") : "";
+          } else {
+            status.textContent = result && typeof result === "object" && "error" in result ? String(result.error) : "Your details could not be sent. WhatsApp us to get your score.";
+          }
+          button.disabled = false;
+          label.textContent = "Try again →";
+        }
+      });
+    });
+
+    // Sticky mobile bar — slides up once, after the hero has left the viewport.
+    const hero = document.querySelector(".hero");
+    const mobileActions = document.querySelector("[data-mobile-actions]");
+    if (hero && mobileActions) {
+      const observer = new IntersectionObserver(([entry]) => mobileActions.classList.toggle("visible", !entry.isIntersecting), { threshold: 0.05 });
+      observer.observe(hero);
+    }
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    // Scroll reveals: fade + 12px rise, once, never re-triggering.
+    const reveals = document.querySelectorAll("[data-reveal]");
+    if (reducedMotion.matches) {
+      reveals.forEach((node) => node.classList.add("revealed"));
+    } else {
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("revealed");
+            revealObserver.unobserve(entry.target);
+          });
+        },
+        { rootMargin: "0px 0px -8% 0px", threshold: 0.08 },
+      );
+      reveals.forEach((node) => revealObserver.observe(node));
+    }
+
+    // Custom pointer: a Signal Red dot at the exact position, with an ink ring
+    // easing in behind it. Fine pointers only; text fields keep the native
+    // caret so typing is never guessed at.
+    const dot = document.querySelector("[data-cursor-dot]");
+    const ring = document.querySelector("[data-cursor-ring]");
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+    if (dot instanceof HTMLElement && ring instanceof HTMLElement && finePointer.matches && !reducedMotion.matches) {
+      const root = document.documentElement;
+      const pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+      const trail = { x: pointer.x, y: pointer.y };
+      let frame = 0;
+
+      const place = (node: HTMLElement, x: number, y: number) => {
+        node.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+      };
+
+      const render = () => {
+        // Lerp: the ring catches up over ~5 frames, so it reads as weight.
+        trail.x += (pointer.x - trail.x) * 0.2;
+        trail.y += (pointer.y - trail.y) * 0.2;
+        place(ring, trail.x, trail.y);
+        place(dot, pointer.x, pointer.y);
+        frame = requestAnimationFrame(render);
+      };
+
+      const start = () => {
+        if (!frame) frame = requestAnimationFrame(render);
+      };
+
+      const stop = () => {
+        cancelAnimationFrame(frame);
+        frame = 0;
+      };
+
+      document.addEventListener(
+        "pointermove",
+        (event) => {
+          if (event.pointerType !== "mouse") return;
+          pointer.x = event.clientX;
+          pointer.y = event.clientY;
+          root.classList.add("cursor-on");
+          const target = event.target;
+          if (target instanceof Element) {
+            root.classList.toggle("cursor-hot", Boolean(target.closest("a, button, summary, select, label")));
+            root.classList.toggle("cursor-text", Boolean(target.closest("input:not([type=hidden]), textarea")));
+          }
+          start();
+        },
+        { passive: true },
+      );
+
+      document.addEventListener("mouseleave", () => {
+        root.classList.remove("cursor-on");
+        stop();
+      });
+
+      document.addEventListener("mouseenter", start);
+      document.addEventListener("pointerdown", () => root.classList.add("cursor-press"));
+      document.addEventListener("pointerup", () => root.classList.remove("cursor-press"));
+      window.addEventListener("blur", () => root.classList.remove("cursor-on", "cursor-press"));
+    }
+  </script>
+</BaseLayout>

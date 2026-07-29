@@ -1,0 +1,56 @@
+---
+interface Props {
+  source: "hero" | "footer";
+}
+
+const { source } = Astro.props;
+const id = `lead-${source}`;
+---
+
+<form class="lead-form" data-lead-form novalidate>
+  <input type="hidden" name="source" value={source} />
+  <div class="honey" aria-hidden="true">
+    <label for={`${id}-company-site`}>Company website</label>
+    <input id={`${id}-company-site`} name="company_site" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <div class="field">
+    <label for={`${id}-name`}>Name</label>
+    <input id={`${id}-name`} name="name" type="text" autocomplete="name" placeholder="Your name" required aria-describedby={`${id}-name-error`} />
+    <p class="field-error" id={`${id}-name-error`} data-error-for="name"></p>
+  </div>
+
+  <div class="field">
+    <label for={`${id}-industry`}>Industry</label>
+    <select id={`${id}-industry`} name="industry" required aria-describedby={`${id}-industry-error`}>
+      <option value="">Choose your industry</option>
+      <option>Clinic / Healthcare</option>
+      <option>Legal & Professional Services</option>
+      <option>Education & Training</option>
+      <option>Property & Construction</option>
+      <option>Retail & F&B</option>
+      <option>Financial Services</option>
+      <option>Beauty & Wellness</option>
+      <option>Other</option>
+    </select>
+    <p class="field-error" id={`${id}-industry-error`} data-error-for="industry"></p>
+  </div>
+
+  <div class="field">
+    <label for={`${id}-email`}>Email</label>
+    <input id={`${id}-email`} name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@company.com" required aria-describedby={`${id}-email-error`} />
+    <p class="field-error" id={`${id}-email-error`} data-error-for="email"></p>
+  </div>
+
+  <div class="field">
+    <label for={`${id}-mobile`}>Mobile number</label>
+    <input id={`${id}-mobile`} name="mobile" type="tel" inputmode="tel" autocomplete="tel" placeholder="01X-XXX XXXX" required aria-describedby={`${id}-mobile-error`} />
+    <p class="field-error" id={`${id}-mobile-error`} data-error-for="mobile"></p>
+  </div>
+
+  <button class="submit-button" type="submit">
+    <span data-button-label>Get my Findability Score →</span>
+  </button>
+  <p class="form-note">We’ll send your score on WhatsApp. No cold calls.</p>
+  <div class="form-status" data-form-status role="status" aria-live="polite"></div>
+</form>
