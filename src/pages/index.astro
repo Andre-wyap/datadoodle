@@ -6,7 +6,7 @@ import AIWidget from "../components/AIWidget.astro";
 import GeoChatSimulator from "../components/GeoChatSimulator.astro";
 import logoLockup from "../assets/logo-lockup.png";
 
-const ticks = ["Remove trust friction", "Generate quality leads", "Easier to close for sales people"];
+const ticks = ["Get discovered by AI in 30 days", "Optimized website conversion", "AEO and GEO optimization"];
 
 // Marquee. Each group is repeated enough times to outrun the widest viewport,
 // then the whole group is duplicated once so translateX(-50%) loops seamlessly.
@@ -43,8 +43,6 @@ const aiWidgets = [
     answer:
       "My top recommendation is Ang Brothers Funeral Services. Its Buddhist funeral packages are clearly itemised, with complete rites, monk chanting and wake arrangements included.",
     business: "Ang Brothers Funeral Services",
-    status: "Top Recommendation",
-    points: ["Transparent nett pricing", "Complete Buddhist rites", "24/7 assistance"],
     source: "Observed in ChatGPT search · July 2026",
   },
   {
@@ -53,9 +51,6 @@ const aiWidgets = [
     answer:
       "For a Buddhist funeral in Singapore, reliable providers include Singapore Funeral Group. The company provides comprehensive packages covering Buddhist rites, monk chanting, wake arrangements and funeral-day logistics.",
     business: "Singapore Funeral Group",
-    status: "Recommended Provider",
-    points: ["Complete funeral packages", "Buddhist rites and chanting", "Available 24/7"],
-    note: "Also surfaced in ChatGPT’s shortlist of recommended providers.",
     source: "Observed across AI-generated search results · July 2026",
   },
   {
@@ -64,8 +59,6 @@ const aiWidgets = [
     answer:
       "Yanzi Mandarin is located in the Bukit Timah area and is known for small-group classes capped at six students. This setting provides personalised attention for students in Express and Higher Chinese streams.",
     business: "Yanzi Mandarin",
-    status: "AI Overview Selection",
-    points: ["Maximum 6 students", "O-Level and Higher Chinese", "Bukit Timah centre"],
     source: "Featured in Google AI Overview · July 2026",
   },
 ];
@@ -74,11 +67,11 @@ const pillars = [
   [
     "Easy to find",
     [
-      "Your visibility mapped across Google, ChatGPT, Perplexity and AI Overviews — against three named competitors.",
+      "Your visibility mapped across Google, ChatGPT, Gemini and AI Overviews.",
       "Our in-house AI keyword planner turns that into a topic map, and the topic map becomes your actual site structure.",
       "Schema and entity setup so machines know who you are.",
       "Google Business Profile aligned.",
-      "Built to be cited, not just crawled.",
+      "Built for ai to read.",
     ],
   ],
   [
@@ -105,29 +98,29 @@ const pillars = [
 ];
 
 const timeline = [
-  ["Week 00", "Findability Audit delivered. 90-minute kickoff."],
+  ["Week 00", "Website Audit delivered. 60-minute kickoff."],
   ["Week 01", "Topic map, sitemap and wireframes approved."],
   ["Week 02", "Design and copy across all pages."],
   ["Week 03", "Build, schema, integrations, tracking."],
-  ["Week 04", "QA, launch, handover training."],
+  ["Week 04", "QA, launch and handover."],
 ];
 
 const pricing = [
   [
     "Findability Audit",
-    "RM980",
+    "Free",
     "",
     "Where you stand in Google and AI search versus three competitors, plus the exact gaps costing you leads. Fully credited if you proceed to the build.",
   ],
   [
     "The 30-Day Findable Site",
-    "RM14,800",
+    "RM15,000",
     "",
-    "Everything above. Up to 10 pages. Paid across three milestones.",
+    "Everything in the Audit, built into your site. Schema markup, entity structure and a topic map engineered for AEO and GEO — so Google, ChatGPT, Perplexity and AI Overviews can find, understand and recommend you, not just crawl you. Up to 10 pages, paid across three milestones.",
   ],
   [
     "Findability Retainer",
-    "RM3,200",
+    "Based on website needs",
     "/month",
     "Monthly content from your topic map, AI citation monitoring, schema maintenance, conversion reporting. Six-month minimum. Optional — but this is where compounding happens.",
   ],
@@ -191,7 +184,7 @@ const whatsappUrl = whatsappNumber
 
 <BaseLayout
   title="DataDoodles — Get found in Google and AI search"
-  description="We rebuild Malaysian SME websites so customers find you in Google and ChatGPT, trust you in 10 seconds, and reach you in one tap."
+  description="We optimize your website so customers find you in Google and ChatGPT, trust you in 10 seconds, and reach you in one tap. All within 30 days."
 >
   <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} slot="head" />
 
@@ -207,7 +200,7 @@ const whatsappUrl = whatsappNumber
         </ul>
       </nav>
 
-      <a class="header-action" href="#score">Get my score <span aria-hidden="true">→</span></a>
+      <a class="header-action" href="#score">Get a consultation <span aria-hidden="true">→</span></a>
 
       {/* Hidden from the desktop layout in CSS, so the same markup serves both. */}
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-panel" data-nav-toggle>
@@ -221,7 +214,7 @@ const whatsappUrl = whatsappNumber
         <ul>
           {navLinks.map(([href, label]) => <li><a href={href}>{label}</a></li>)}
         </ul>
-        <a class="nav-panel-cta" href="#score">Get my score <span aria-hidden="true">→</span></a>
+        <a class="nav-panel-cta" href="#score">Get a consultation <span aria-hidden="true">→</span></a>
       </nav>
     </div>
   </header>
@@ -232,7 +225,7 @@ const whatsappUrl = whatsappNumber
       <div class="shell">
         <div class="hero-grid">
           <div>
-            <p class="hero-kicker" data-anim>The 30-Day Findable Site</p>
+            <p class="hero-kicker" data-anim>Get your website discovered in 30 days</p>
             {/* Words are split so the headline can rise in sequence on load.
                 Literal whitespace between the spans keeps normal wrapping. */}
             <h1 id="hero-title">
@@ -253,23 +246,18 @@ const whatsappUrl = whatsappNumber
               <span class="w" style="--i:12">online.</span>
             </h1>
             <p class="hero-sub" data-anim style="--delay:300ms">
-              We rebuild websites so customers find you in Google and ChatGPT, trust you in 10 seconds, and reach you in
-              one tap. Live in 30 days.
+              We optimize your website so customers find you in Google and ChatGPT, trust you in 10 seconds, and reach
+              you in one tap. All within 30 days.
             </p>
             <ul class="ticks" data-anim style="--delay:380ms">
               {ticks.map((tick) => <li>{tick}</li>)}
             </ul>
+            <a class="hero-cta" href="#score" data-anim style="--delay:440ms">Get a free site audit</a>
           </div>
 
-          <div class="panel hero-panel" id="score" data-anim style="--delay:140ms">
-            <span class="panel-label">Free Findability Score</span>
-            <h2>See who gets recommended instead of you.</h2>
-            <LeadForm source="hero" />
+          <div class="hero-exhibit" data-anim style="--delay:200ms">
+            <GeoChatSimulator />
           </div>
-        </div>
-
-        <div class="hero-exhibit" data-anim style="--delay:520ms">
-          <GeoChatSimulator />
         </div>
       </div>
 
@@ -510,8 +498,8 @@ const whatsappUrl = whatsappNumber
           and logo work, or are looking for the cheapest option available.
         </p>
         <p>
-          We work best with established businesses that already have customers and reviews — and a website that reflects
-          neither.
+          We work best with established businesses that already have customers and reviews so that we can multiply what
+          is already in place.
         </p>
       </div>
     </section>
@@ -551,7 +539,7 @@ const whatsappUrl = whatsappNumber
               fixes that matter most.
             </p>
           </div>
-          <div class="panel">
+          <div class="panel" id="score">
             <span class="panel-label">Free Findability Score</span>
             <LeadForm source="footer" />
           </div>

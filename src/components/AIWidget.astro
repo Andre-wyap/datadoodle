@@ -1,8 +1,8 @@
 ---
 /**
  * A real AI-answer evidence card: the label, the query that was asked, the
- * model's answer with the recommended business marked, its status, and the
- * points backing it up — plus the source note that dates the observation.
+ * model's answer with the recommended business marked, plus the source note
+ * that dates the observation.
  *
  * Unlike <Exhibit>, this never renders a skeleton or a screenshot inline.
  * If `screenshot` is supplied, a text control opens it enlarged in the
@@ -19,16 +19,13 @@ interface Props {
   query: string;
   answer: string;
   business: string;
-  status: string;
-  points: string[];
-  note?: string;
   source: string;
   screenshot?: Screenshot;
   /** Position in a row of widgets. Sets the scroll-reveal stagger. */
   index?: number;
 }
 
-const { label, query, answer, business, status, points, note, source, screenshot, index } = Astro.props;
+const { label, query, answer, business, source, screenshot, index } = Astro.props;
 const reveal = index !== undefined;
 
 const splitAt = answer.indexOf(business);
@@ -55,13 +52,6 @@ const after = splitAt >= 0 ? answer.slice(splitAt + business.length) : "";
       <strong class="named">{business}</strong>
       {after}
     </p>
-    <span class="ai-widget-status">{status}</span>
-
-    <ul class="ai-widget-points">
-      {points.map((point) => <li>{point}</li>)}
-    </ul>
-
-    {note && <p class="ai-widget-note">{note}</p>}
   </div>
 
   <figcaption class="ai-widget-source">{source}</figcaption>

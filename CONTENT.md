@@ -65,7 +65,7 @@ Sections
 
 ### Header call to action
 
-Get my score →
+Get a consultation
 
 ### Mobile menu controls
 
@@ -75,7 +75,7 @@ Get my score →
 
 ### Mobile menu call to action
 
-Get my score →
+Get a consultation
 
 ---
 
@@ -83,7 +83,7 @@ Get my score →
 
 ### Kicker
 
-The 30-Day Findable Site
+Get your website discovered in 30 days
 
 ### Main headline
 
@@ -91,21 +91,21 @@ Your competitors are not always better. They are just easier to choose online.
 
 ### Supporting paragraph
 
-We rebuild websites so customers find you in Google and ChatGPT, trust you in 10 seconds, and reach you in one tap. Live in 30 days.
+We optimize your website so customers find you in Google and ChatGPT, trust you in 10 seconds, and reach you in one tap. All within 30 days.
 
 ### Benefit points
 
-- Remove trust friction
-- Generate quality leads
-- Easier to close for sales people
+- Get discovered by AI in 30 days
+- Optimized website conversion
+- AEO and GEO optimization
 
 ### Hero form label
 
-Free Findability Score
+Free Website Audit
 
 ### Hero form headline
 
-See who gets recommended instead of you.
+Get a 30 minutes consultation you can be discovered by AI in 30-days
 
 ### Hero GEO chat simulator
 
@@ -241,10 +241,6 @@ That’s the gap we build for.
 - Query: Buddhist funeral recommendation in Singapore
 - Answer: My top recommendation is Ang Brothers Funeral Services. Its Buddhist funeral packages are clearly itemised, with complete rites, monk chanting and wake arrangements included.
 - Business: Ang Brothers Funeral Services
-- Status: Top Recommendation
-- Supporting point: Transparent nett pricing
-- Supporting point: Complete Buddhist rites
-- Supporting point: 24/7 assistance
 - Source: Observed in ChatGPT search · July 2026
 
 ### AI evidence card 2
@@ -253,11 +249,6 @@ That’s the gap we build for.
 - Query: Reliable Buddhist funeral services in Singapore
 - Answer: For a Buddhist funeral in Singapore, reliable providers include Singapore Funeral Group. The company provides comprehensive packages covering Buddhist rites, monk chanting, wake arrangements and funeral-day logistics.
 - Business: Singapore Funeral Group
-- Status: Recommended Provider
-- Supporting point: Complete funeral packages
-- Supporting point: Buddhist rites and chanting
-- Supporting point: Available 24/7
-- Note: Also surfaced in ChatGPT’s shortlist of recommended providers.
 - Source: Observed across AI-generated search results · July 2026
 
 ### AI evidence card 3
@@ -266,10 +257,6 @@ That’s the gap we build for.
 - Query: Best O Level Chinese tuition in Bukit Timah
 - Answer: Yanzi Mandarin is located in the Bukit Timah area and is known for small-group classes capped at six students. This setting provides personalised attention for students in Express and Higher Chinese streams.
 - Business: Yanzi Mandarin
-- Status: AI Overview Selection
-- Supporting point: Maximum 6 students
-- Supporting point: O-Level and Higher Chinese
-- Supporting point: Bukit Timah centre
 - Source: Featured in Google AI Overview · July 2026
 
 ### AI evidence controls
@@ -303,11 +290,11 @@ Every page we build is judged against these three. Nothing else matters.
 
 ### Easy to find
 
-- Your visibility mapped across Google, ChatGPT, Perplexity and AI Overviews — against three named competitors.
+- Your visibility mapped across Google, ChatGPT, Gemini and AI Overviews.
 - Our in-house AI keyword planner turns that into a topic map, and the topic map becomes your actual site structure.
 - Schema and entity setup so machines know who you are.
 - Google Business Profile aligned.
-- Built to be cited, not just crawled.
+- Built for ai to read.
 
 ### Easy to trust
 
@@ -348,7 +335,7 @@ Live in 30 days. Here’s exactly how.
 
 ### Week 00
 
-Findability Audit delivered. 90-minute kickoff.
+Website Audit delivered. 60-minute kickoff.
 
 ### Week 01
 
@@ -364,7 +351,7 @@ Build, schema, integrations, tracking.
 
 ### Week 04
 
-QA, launch, handover training.
+QA, launch and handover.
 
 ### Client time commitment
 
@@ -444,17 +431,17 @@ No quotes. No discovery-call ambush.
 
 ### Findability Audit
 
-- Price: RM980
+- Price: Free
 - Description: Where you stand in Google and AI search versus three competitors, plus the exact gaps costing you leads. Fully credited if you proceed to the build.
 
 ### The 30-Day Findable Site
 
-- Price: RM14,800
-- Description: Everything above. Up to 10 pages. Paid across three milestones.
+- Price: RM15,000
+- Description: Everything in the Audit, built into your site. Schema markup, entity structure and a topic map engineered for AEO and GEO — so Google, ChatGPT, Perplexity and AI Overviews can find, understand and recommend you, not just crawl you. Up to 10 pages, paid across three milestones.
 
 ### Findability Retainer
 
-- Price: RM3,200
+- Price: Based on website needs
 - Billing unit: /month
 - Description: Monthly content from your topic map, AI citation monitoring, schema maintenance, conversion reporting. Six-month minimum. Optional — but this is where compounding happens.
 
@@ -476,7 +463,7 @@ We’re not the right fit if you’re pre-revenue, need e-commerce or custom app
 
 ### Paragraph 2
 
-We work best with established businesses that already have customers and reviews — and a website that reflects neither.
+We work best with established businesses that already have customers and reviews so that we can multiply what is already in place.
 
 ---
 

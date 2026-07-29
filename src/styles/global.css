@@ -535,11 +535,6 @@ main [id],
   border-radius: 4px;
 }
 
-.hero-panel {
-  position: sticky;
-  top: calc(var(--header-h) + var(--s4));
-}
-
 .panel h2 {
   margin-bottom: var(--s5);
   font-size: clamp(1.4rem, 1.9vw, 1.65rem);
@@ -555,11 +550,35 @@ main [id],
   text-transform: uppercase;
 }
 
-/* Sized to the hero's 7-column measure, so its left and right edges land on
-   the same lines as the headline above it. */
+/* The hero's only call to action: everything else on this page defers to it. */
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 56px;
+  margin-top: var(--s6);
+  padding: 0 var(--s4);
+  border-radius: 4px;
+  background: var(--ink);
+  color: var(--surface);
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 200ms var(--ease), transform 120ms var(--ease);
+}
+
+.hero-cta:hover {
+  background: #2a2c2b;
+  color: var(--surface);
+}
+
+.hero-cta:active {
+  transform: translateY(1px);
+}
+
+/* Desktop: the hero's 5-column slot, beside the copy. Below the breakpoint
+   the grid stacks and this becomes a full-width block under the CTA. */
 .hero-exhibit {
-  max-width: calc((100% - var(--split-gap)) * 7 / 12);
-  margin-top: var(--s10);
+  min-width: 0;
 }
 
 /* Marquee: the hero's closing band and the divider into the next section.
@@ -1591,9 +1610,8 @@ main [id],
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .hero-panel {
-    position: static;
-    max-width: 560px;
+  .hero-grid {
+    gap: var(--s6);
   }
 
   .col-grid {
@@ -1627,10 +1645,6 @@ main [id],
     min-height: 0;
   }
 
-  .hero-exhibit {
-    max-width: 620px;
-  }
-
   .exhibit--lead .exhibit-body {
     padding: var(--s5);
   }
@@ -1656,7 +1670,7 @@ main [id],
   }
 
   .hero-grid {
-    gap: var(--s8);
+    gap: var(--s4);
   }
 
   .ticks {
@@ -1678,12 +1692,14 @@ main [id],
     padding: var(--s4) var(--s3);
   }
 
-  .hero-exhibit {
-    margin-top: var(--s8);
+  .hero-cta {
+    width: 100%;
+    justify-content: center;
+    margin-top: var(--s5);
   }
 
   .marquee {
-    margin-top: var(--s10);
+    margin-top: var(--s5);
   }
 
   .marquee-row--sub {
