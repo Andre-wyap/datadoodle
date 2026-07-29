@@ -7,6 +7,12 @@ import logoLockup from "../assets/logo-lockup.png";
 
 const ticks = ["Remove trust friction", "Generate quality leads", "Easier to close for sales people"];
 
+// Marquee. Each group is repeated enough times to outrun the widest viewport,
+// then the whole group is duplicated once so translateX(-50%) loops seamlessly.
+const disciplines = ["GEO", "AEO", "SEO"];
+const promises = ["Easy to find", "Easy to trust", "Easy to contact"];
+const repeat = <T,>(items: T[], times: number) => Array.from({ length: times }, () => items).flat();
+
 const fears = [
   [
     "They didn’t know what you actually do.",
@@ -220,10 +226,44 @@ const whatsappUrl = whatsappNumber
           />
         </div>
       </div>
+
+      <p class="sr-only">
+        DataDoodles builds for GEO, AEO and SEO. Easy to find, easy to trust, easy to contact.
+      </p>
+
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-row marquee-row--lead">
+          <div class="marquee-track" style="--speed:92s">
+            {
+              [0, 1].map(() => (
+                <div class="marquee-group">
+                  {repeat(disciplines, 5).map((word) => (
+                    <span class="marquee-word">{word}</span>
+                  ))}
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="marquee-row marquee-row--sub">
+          <div class="marquee-track marquee-track--reverse" style="--speed:68s">
+            {
+              [0, 1].map(() => (
+                <div class="marquee-group">
+                  {repeat(promises, 8).map((phrase) => (
+                    <span class="marquee-word">{phrase}</span>
+                  ))}
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- 01 Four fears ---------------------------------------------------- -->
-    <section class="section section--catch" aria-labelledby="fears-title">
+    <section class="section" aria-labelledby="fears-title">
       <div class="shell">
         <div class="section-head" data-reveal>
           <p class="eyebrow">
@@ -494,6 +534,10 @@ const whatsappUrl = whatsappNumber
   <div class="cursor-ring" data-cursor-ring aria-hidden="true"></div>
   <div class="cursor-dot" data-cursor-dot aria-hidden="true"></div>
 
+  {/* Pixel grid that lights under the pointer, and under a finger while
+      scrolling. Sits behind everything and never receives events. */}
+  <canvas class="pixels" data-pixels aria-hidden="true"></canvas>
+
   <script>
     const mobilePattern = /^(?:\+?60|0)1[0-46-9]\d{7,8}$/;
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -651,6 +695,151 @@ const whatsappUrl = whatsappNumber
       document.addEventListener("pointerdown", () => root.classList.add("cursor-press"));
       document.addEventListener("pointerup", () => root.classList.remove("cursor-press"));
       window.addEventListener("blur", () => root.classList.remove("cursor-on", "cursor-press"));
+    }
+
+    // Pixel grid. Cells under the pointer — or under a finger while scrolling —
+    // light and then decay. The loop only runs while something is still lit, so
+    // an idle page costs nothing.
+    const canvas = document.querySelector("[data-pixels]");
+    const ctx = canvas instanceof HTMLCanvasElement ? canvas.getContext("2d") : null;
+
+    if (canvas instanceof HTMLCanvasElement && ctx && !reducedMotion.matches) {
+      const CELL = window.matchMedia("(max-width: 720px)").matches ? 22 : 26;
+      const DECAY = 0.03;
+      const cells = new Map<number, number>();
+      let cols = 0;
+      let rows = 0;
+      let pixelFrame = 0;
+
+      const size = () => {
+        const ratio = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.ceil(window.innerWidth * ratio);
+        canvas.height = Math.ceil(window.innerHeight * ratio);
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        cols = Math.ceil(window.innerWidth / CELL);
+        rows = Math.ceil(window.innerHeight / CELL);
+        cells.clear();
+      };
+
+      const paint = () => {
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        cells.forEach((level, key) => {
+          const next = level - DECAY;
+          if (next <= 0.02) {
+            cells.delete(key);
+            return;
+          }
+          cells.set(key, next);
+          const col = key % cols;
+          const row = (key - col) / cols;
+          const x = col * CELL;
+          const y = row * CELL;
+
+          // Cells stay light enough that text over them still clears 4.5:1.
+          ctx.fillStyle = `rgba(17, 17, 17, ${next * 0.1})`;
+          ctx.fillRect(x, y, CELL - 1, CELL - 1);
+
+          // A deterministic scatter of Signal Red through the patch. Drawn as a
+          // small centred mark rather than a flood, so it reads as a pixel
+          // without washing out anything sitting on top of it.
+          if ((col * 31 + row * 17) % 9 === 0) {
+            const mark = Math.round(CELL * 0.34);
+            const offset = Math.round((CELL - 1 - mark) / 2);
+            ctx.fillStyle = `rgba(226, 30, 53, ${next * 0.5})`;
+            ctx.fillRect(x + offset, y + offset, mark, mark);
+          }
+        });
+        pixelFrame = cells.size ? requestAnimationFrame(paint) : 0;
+      };
+
+      const spread = [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+        [1, 1],
+        [-1, -1],
+        [1, -1],
+        [-1, 1],
+      ];
+
+      const light = (x: number, y: number, strength: number) => {
+        const col = Math.floor(x / CELL);
+        const row = Math.floor(y / CELL);
+        const patch: number[][] = [[0, 0]];
+        // Four of the eight neighbours, so the patch has an irregular edge
+        // instead of reading as a stamped plus sign.
+        for (let n = 0; n < 4; n++) patch.push(spread[Math.floor(Math.random() * spread.length)]);
+
+        patch.forEach(([dx, dy], index) => {
+          const c = col + dx;
+          const r = row + dy;
+          if (c < 0 || r < 0 || c >= cols || r >= rows) return;
+          const key = r * cols + c;
+          const add = index === 0 ? strength : strength * 0.5;
+          cells.set(key, Math.min(1, (cells.get(key) || 0) + add));
+        });
+
+        if (!pixelFrame) pixelFrame = requestAnimationFrame(paint);
+      };
+
+      size();
+
+      let resizeTimer = 0;
+      window.addEventListener("resize", () => {
+        window.clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(size, 150);
+      });
+
+      document.addEventListener(
+        "pointermove",
+        (event) => {
+          if (event.pointerType !== "mouse") return;
+          light(event.clientX, event.clientY, 0.85);
+        },
+        { passive: true },
+      );
+
+      // Touch: the patch follows the finger as it drags the page.
+      document.addEventListener(
+        "touchmove",
+        (event) => {
+          for (let i = 0; i < event.touches.length; i++) {
+            light(event.touches[i].clientX, event.touches[i].clientY, 1);
+          }
+        },
+        { passive: true },
+      );
+
+      // Momentum scrolling carries on after the finger lifts, so keep lighting
+      // cells along the last touch column, once per frame at most.
+      let lastTouchX = 0;
+      let lastTouchY = 0;
+      let scrollQueued = false;
+
+      document.addEventListener(
+        "touchstart",
+        (event) => {
+          lastTouchX = event.touches[0].clientX;
+          lastTouchY = event.touches[0].clientY;
+        },
+        { passive: true },
+      );
+
+      if (!finePointer.matches) {
+        window.addEventListener(
+          "scroll",
+          () => {
+            if (scrollQueued) return;
+            scrollQueued = true;
+            requestAnimationFrame(() => {
+              scrollQueued = false;
+              light(lastTouchX || window.innerWidth / 2, lastTouchY || window.innerHeight / 2, 0.5);
+            });
+          },
+          { passive: true },
+        );
+      }
     }
   </script>
 </BaseLayout>

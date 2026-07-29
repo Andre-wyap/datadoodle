@@ -85,7 +85,6 @@
   --gutter: 64px;
   --shell: min(100% - (var(--gutter) * 2), 1280px);
   --section-space: clamp(80px, 8vw, 120px);
-  --overhang: clamp(48px, 6vw, 88px);
   /* Shared by the hero and final-CTA grids so the copy column, the form and
      the exhibit below them all resolve to the same column edges. */
   --split-gap: clamp(40px, 6vw, 96px);
@@ -100,14 +99,16 @@
   box-sizing: border-box;
 }
 
+/* The page background lives on the root so the pixel canvas can sit between it
+   and the content. Giving body a background would paint over the canvas. */
 html {
+  background: var(--paper);
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
-  background: var(--paper);
   color: var(--ink-body);
   font-family: var(--font-body);
   font-size: 1rem;
@@ -217,11 +218,6 @@ strong {
 .section {
   padding-block: var(--section-space);
   border-bottom: 1px solid var(--rule-light);
-}
-
-/* The one deliberate exception: the section that catches the hero exhibit. */
-.section--catch {
-  padding-top: calc(var(--section-space) + var(--overhang));
 }
 
 .section-head {
@@ -399,15 +395,104 @@ strong {
   text-transform: uppercase;
 }
 
-/* The exhibit breaks the fold on purpose — the only overhang on the page.
-   Its width is the hero's 7-column measure, so its left and right edges land
-   on the same lines as the headline above it. */
+/* Sized to the hero's 7-column measure, so its left and right edges land on
+   the same lines as the headline above it. */
 .hero-exhibit {
-  position: relative;
-  z-index: 1;
   max-width: calc((100% - var(--split-gap)) * 7 / 12);
   margin-top: var(--s10);
-  margin-bottom: calc(var(--overhang) * -1);
+}
+
+/* Marquee: the hero's closing band and the divider into the next section.
+   Two rows running against each other — disciplines over promises. */
+.marquee {
+  margin-top: var(--s12);
+  border-top: 1px solid var(--rule-light);
+  border-bottom: 1px solid var(--rule-light);
+}
+
+.marquee-row {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+.marquee-row + .marquee-row {
+  border-top: 1px solid var(--rule-light);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: marquee var(--speed, 40s) linear infinite;
+}
+
+.marquee-track--reverse {
+  animation-direction: reverse;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+.marquee-group {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+/* Every word carries its own separator, so the seam between one group and the
+   next keeps the same rhythm as the words inside it. */
+.marquee-word::before {
+  content: "";
+  display: inline-block;
+  width: 0.11em;
+  height: 0.11em;
+  margin-right: 0.42em;
+  border-radius: 50%;
+  background: var(--rule);
+  vertical-align: 0.26em;
+}
+
+.marquee-row--lead {
+  padding-block: clamp(12px, 1.6vw, 20px);
+}
+
+.marquee-row--lead .marquee-track {
+  color: var(--ink);
+  font: 700 clamp(2.25rem, 5.6vw, 4.5rem) / 1.1 var(--font-display);
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+.marquee-row--lead .marquee-group {
+  gap: 0.36em;
+}
+
+.marquee-row--sub {
+  padding-block: 12px;
+}
+
+.marquee-row--sub .marquee-track {
+  color: var(--muted);
+  font: 500 0.8125rem/1.5 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Gap and separator margin match, so each dot sits centred between two phrases. */
+.marquee-row--sub .marquee-group {
+  gap: 0.75em;
+}
+
+.marquee-row--sub .marquee-word::before {
+  margin-right: 0.75em;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* Exhibits ---------------------------------------------------------------- */
@@ -1091,7 +1176,8 @@ strong {
   color: var(--ink);
 }
 
-.honey {
+.honey,
+.sr-only {
   position: absolute;
   left: -10000px;
   width: 1px;
@@ -1165,7 +1251,6 @@ strong {
   :root {
     --gutter: 16px;
     --section-space: 64px;
-    --overhang: 0px;
   }
 
   body {
@@ -1213,6 +1298,14 @@ strong {
 
   .hero-exhibit {
     margin-top: var(--s8);
+  }
+
+  .marquee {
+    margin-top: var(--s10);
+  }
+
+  .marquee-row--sub {
+    padding-block: 10px;
   }
 
   .exhibit-body {
@@ -1388,6 +1481,16 @@ strong {
   transform: none;
 }
 
+/* Pixel grid -------------------------------------------------------------- */
+.pixels {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
 /* Custom pointer ---------------------------------------------------------- */
 .cursor-dot,
 .cursor-ring {
@@ -1476,7 +1579,13 @@ strong {
   }
 
   .cursor-dot,
-  .cursor-ring {
+  .cursor-ring,
+  .pixels {
     display: none;
+  }
+
+  /* The strips hold still and stay readable rather than snapping to the end. */
+  .marquee-track {
+    animation: none !important;
   }
 }

@@ -39,7 +39,7 @@ Alignment rules:
 - Every section opens with the same device: mono label — 1px rule — section index, spanning the full grid width.
 - Column blocks (pillars, case studies, pricing tiers) share one construction: a 1px Deep Onyx top rule plus CSS subgrid, so headings, prices and figures line up horizontally across columns regardless of copy length.
 - The hero, shift and final-CTA splits share `--split-gap`, and the hero exhibit is sized to the hero's own 7-column measure so its edges land on the headline's edges.
-- The only deliberate grid break is the hero exhibit overhanging the next section; the overhang and the compensating padding both read from `--overhang`.
+- The deliberate grid breaks are full-bleed bands: the marquee closing the hero and the inverted shift section. Everything else stays inside the shell.
 
 ## Components
 
@@ -57,7 +57,14 @@ All motion uses `cubic-bezier(0.32, 0.72, 0, 1)` and is armed by the `js` class,
 - **Interactions**: 120–200ms. Nothing a user triggers animates for longer than that.
 - **Hero load sequence**: one pass, roughly one second end to end — kicker, then the form, then the headline rising word by word (460ms each, 28ms apart), then the sub and the claims, then the Signal Red rule wiping in under “easier to choose”, then the recommendation tag on the exhibit. It runs once, on load, and never repeats.
 - **Scroll reveals**: fade plus 12px rise, 400ms, once, never re-triggering. Items in the same row carry `--i` and follow each other 70ms apart.
+- **Hero marquee**: two counter-running strips closing the hero — GEO / AEO / SEO in the display face over the three promises in mono. Linear, 92s and 68s per cycle, paused on hover. The loop is seamless because each track holds two identical groups and travels exactly `-50%`; groups are repeated wide enough to outrun a 2988px viewport. The whole band is `aria-hidden`, with one visually hidden sentence carrying the words for screen readers and models.
 - **Banned**: parallax, scroll-jacking, counting numbers, typewriter effects, anything that delays reading.
+
+## Background
+
+A fixed canvas sits between the page background and the content, holding a 26px grid (22px on mobile). Cells light under the pointer, and under a finger while scrolling — a small irregular patch each time, decaying over roughly half a second. A deterministic scatter of cells carries a small Signal Red mark inside them. The page background therefore lives on `html`, not `body`, so the canvas can sit behind the content without a body background painting over it.
+
+Cell opacity is capped so that text sitting over a lit cell still clears 4.5:1 against every text colour in the system; the red marks are drawn as a small centred square rather than a flood for the same reason. The loop only runs while something is still lit, so an idle page costs nothing, and the whole effect is off under reduced motion.
 
 ## Pointer
 
