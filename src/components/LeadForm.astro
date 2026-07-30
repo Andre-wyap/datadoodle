@@ -21,36 +21,28 @@ const id = `lead-${source}`;
   </div>
 
   <div class="field">
-    <label for={`${id}-industry`}>Industry</label>
-    <select id={`${id}-industry`} name="industry" required aria-describedby={`${id}-industry-error`}>
-      <option value="">Choose your industry</option>
-      <option>Clinic / Healthcare</option>
-      <option>Legal & Professional Services</option>
-      <option>Education & Training</option>
-      <option>Property & Construction</option>
-      <option>Retail & F&B</option>
-      <option>Financial Services</option>
-      <option>Beauty & Wellness</option>
-      <option>Other</option>
-    </select>
-    <p class="field-error" id={`${id}-industry-error`} data-error-for="industry"></p>
+    <label for={`${id}-company`}>Company name</label>
+    <input id={`${id}-company`} name="company" type="text" autocomplete="organization" placeholder="Your company name" required aria-describedby={`${id}-company-error`} />
+    <p class="field-error" id={`${id}-company-error`} data-error-for="company"></p>
   </div>
 
   <div class="field">
-    <label for={`${id}-email`}>Email</label>
+    <label for={`${id}-email`}>Email address</label>
     <input id={`${id}-email`} name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@company.com" required aria-describedby={`${id}-email-error`} />
     <p class="field-error" id={`${id}-email-error`} data-error-for="email"></p>
   </div>
 
   <div class="field">
-    <label for={`${id}-mobile`}>Mobile number</label>
+    <label for={`${id}-mobile`}>Phone number</label>
     <input id={`${id}-mobile`} name="mobile" type="tel" inputmode="tel" autocomplete="tel" placeholder="01X-XXX XXXX" required aria-describedby={`${id}-mobile-error`} />
     <p class="field-error" id={`${id}-mobile-error`} data-error-for="mobile"></p>
   </div>
 
   <button class="submit-button" type="submit">
-    <span data-button-label>Get my Findability Score →</span>
+    <span data-button-label>Check My AI Visibility</span>
   </button>
-  <p class="form-note">We’ll send your score on WhatsApp. No cold calls.</p>
+  <p class="form-note">
+    No obligation. We will contact you to understand your business and explain the next step.
+  </p>
   <div class="form-status" data-form-status role="status" aria-live="polite"></div>
 </form>

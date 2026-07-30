@@ -2,16 +2,6 @@ import type { APIRoute } from "astro";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const malaysiaMobilePattern = /^(?:\+?60|0)1[0-46-9]\d{7,8}$/;
-const allowedIndustries = new Set([
-  "Clinic / Healthcare",
-  "Legal & Professional Services",
-  "Education & Training",
-  "Property & Construction",
-  "Retail & F&B",
-  "Financial Services",
-  "Beauty & Wellness",
-  "Other",
-]);
 
 export const POST: APIRoute = async ({ request }) => {
   let body: Record<string, unknown>;
@@ -29,13 +19,18 @@ export const POST: APIRoute = async ({ request }) => {
   const name = String(body.name || "").trim();
   const email = String(body.email || "").trim().toLowerCase();
   const mobile = String(body.mobile || "").replace(/[\s-]/g, "");
-  const industry = String(body.industry || "");
-  const source = body.source === "footer" ? "footer" : "hero";
+  const company = String(body.company || "").trim();
+  // The page carries one form component, rendered in the hero modal or the
+  // footer panel. Anything else is treated as the hero.
+  const allowedSources = new Set(["hero", "footer"]);
+  const source = allowedSources.has(String(body.source)) ? String(body.source) : "hero";
 
   if (name.length < 2) return Response.json({ field: "name", error: "Enter your name." }, { status: 422 });
-  if (!allowedIndustries.has(industry)) return Response.json({ field: "industry", error: "Choose your industry." }, { status: 422 });
+  if (company.length < 2)
+    return Response.json({ field: "company", error: "Enter your company name." }, { status: 422 });
   if (!emailPattern.test(email)) return Response.json({ field: "email", error: "Enter a valid email address." }, { status: 422 });
-  if (!malaysiaMobilePattern.test(mobile)) return Response.json({ field: "mobile", error: "Enter a valid Malaysian mobile number." }, { status: 422 });
+  if (!malaysiaMobilePattern.test(mobile))
+    return Response.json({ field: "mobile", error: "Enter a valid Malaysian phone number." }, { status: 422 });
 
   const webhookUrl = import.meta.env.N8N_LEAD_WEBHOOK_URL;
   if (!webhookUrl) {
@@ -45,7 +40,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   const payload = {
     name,
-    industry,
+    company,
     email,
     mobile,
     source,

@@ -280,7 +280,9 @@ strong {
   border-bottom: 1px solid var(--rule-light);
 }
 
-.site-header .shell {
+/* Direct child only — the mobile nav-panel also nests a `.shell` (around its
+   link list and CTA), which must stay block-stacked, not turned into a row. */
+.site-header > .shell {
   display: flex;
   align-items: center;
   justify-content: space-between;
