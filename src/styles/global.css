@@ -1834,6 +1834,26 @@ main [id],
   cursor: none;
 }
 
+/* <dialog> renders in the browser's top layer, always above the fixed-position
+   cursor dot/ring. Hand the native cursor back while one is open, or the
+   replacement sits hidden behind the modal and nothing shows at all. */
+html:has(dialog[open]) {
+  cursor: auto;
+}
+
+html:has(dialog[open]) a,
+html:has(dialog[open]) button,
+html:has(dialog[open]) summary,
+html:has(dialog[open]) select,
+html:has(dialog[open]) label {
+  cursor: pointer;
+}
+
+html:has(dialog[open]) .cursor-dot,
+html:has(dialog[open]) .cursor-ring {
+  opacity: 0;
+}
+
 .cursor-hot .cursor-ring {
   width: 46px;
   height: 46px;
