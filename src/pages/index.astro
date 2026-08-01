@@ -384,7 +384,7 @@ const whatsappUrl = whatsappNumber
       <div class="shell">
         <div class="section-head section-head--wide" data-reveal>
           <p class="eyebrow"><span>Evidence</span><span class="eyebrow-idx">01</span></p>
-          <h2 id="results-title">We Ranked Our Clients</h2>
+          <h2 id="results-title">Rank Like Our Clients</h2>
           <p class="lede">
             We've helped more than 70 businesses get found on Google and in AI search: ChatGPT, Gemini, Perplexity
             and Google AI Overview. Every capture below is dated, and proves what was true on that date.
@@ -413,7 +413,16 @@ const whatsappUrl = whatsappNumber
           <ul class="carousel-track" data-carousel-track tabindex="0" role="list" aria-label="Case studies">
             {
               cases.map((item) => (
-                <li class="case">
+                <li
+                  class="case"
+                  data-proof
+                  data-proof-src={item.shot.src}
+                  data-proof-company={item.company}
+                  data-proof-query={item.query}
+                  data-proof-platform={item.platform}
+                  data-proof-verified={item.verified}
+                  data-proof-caveat={item.caveat || ""}
+                >
                   <figure class="case-shot">
                     <img
                       src={item.shot.src}
@@ -448,18 +457,8 @@ const whatsappUrl = whatsappNumber
 
                     {item.caveat && <p class="case-caveat">{item.caveat}</p>}
 
-                    <button
-                      type="button"
-                      class="proof-action"
-                      data-proof
-                      data-proof-src={item.shot.src}
-                      data-proof-company={item.company}
-                      data-proof-query={item.query}
-                      data-proof-platform={item.platform}
-                      data-proof-verified={item.verified}
-                      data-proof-caveat={item.caveat || ""}
-                    >
-                      View proof <span aria-hidden="true">→</span>
+                    <button type="button" class="proof-action">
+                      View case study <span aria-hidden="true">→</span>
                     </button>
                   </div>
                 </li>
@@ -1473,6 +1472,12 @@ const whatsappUrl = whatsappNumber
       border-radius: 4px;
       overflow: hidden;
       scroll-snap-align: start;
+      cursor: pointer;
+      transition: border-color 180ms var(--ease);
+    }
+
+    .case:hover {
+      border-color: var(--outline);
     }
 
     /* Fixed ratio, so all six captures occupy identical height however tall the
