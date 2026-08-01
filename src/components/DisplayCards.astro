@@ -1,0 +1,219 @@
+---
+/**
+ * Stacked prompt cards — the hero exhibit.
+ *
+ * Three overlapping cards showing the kind of question a customer now asks an
+ * assistant instead of typing keywords. Skewed and stacked so the eye reads
+ * them as a pile of real conversations, not a feature list.
+ *
+ * CSS only: the lift and the scrim clearing are hover states. Nothing ships to
+ * the client, which keeps the hero inside the "no JS above the fold except the
+ * form" rule.
+ */
+
+interface Card {
+  platform: string;
+  query: string;
+  date: string;
+}
+
+interface Props {
+  cards?: Card[];
+}
+
+const {
+  cards = [
+    { platform: "ChatGPT", query: "Who is the best plumber in KL", date: "Just now" },
+    { platform: "Perplexity", query: "List the top 10 chicken supplier in Klang Valley", date: "2 days ago" },
+    { platform: "Gemini", query: "What is a good Arabic restaurant in PJ", date: "Today" },
+  ],
+}: Props = Astro.props;
+---
+
+<figure class="prompt-stack">
+  <ul class="prompt-cards">
+    {
+      cards.map((card, i) => (
+        <li class="prompt-card" style={`--i:${i}`}>
+          <p class="prompt-card-head">
+            <span class="prompt-card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
+                <path d="M20 3v4" />
+                <path d="M22 5h-4" />
+                <path d="M4 17v2" />
+                <path d="M5 18H3" />
+              </svg>
+            </span>
+            <span class="prompt-card-platform">{card.platform}</span>
+          </p>
+          <p class="prompt-card-query">{card.query}</p>
+          <p class="prompt-card-date">{card.date}</p>
+        </li>
+      ))
+    }
+  </ul>
+</figure>
+
+<style>
+  .prompt-stack {
+    margin: 0;
+    /* The back cards sit up to 80px below the figure's own box (a transform,
+       so it doesn't grow the box) — pad the figure so they clear whatever
+       follows in the hero instead of overlapping it. */
+    padding-bottom: calc(80px + var(--s5));
+    min-width: 0;
+  }
+
+  /* All three cards occupy one grid cell; the offsets below do the stacking. */
+  .prompt-cards {
+    display: grid;
+    grid-template-areas: "stack";
+    place-items: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .prompt-card {
+    grid-area: stack;
+    position: relative;
+    display: flex;
+    width: min(100%, 22rem);
+    height: 9rem;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 14px var(--s2);
+    background: var(--inverse-surface);
+    border: 1px solid var(--inverse-rule);
+    border-radius: 4px;
+    color: var(--inverse-on);
+    transform: translate(var(--x, 0), var(--y, 0)) skewY(-8deg);
+    transition:
+      transform 260ms var(--ease),
+      border-color 260ms var(--ease);
+  }
+
+  /* The scrim that holds the back cards back. Cleared on hover.
+     Capped at 25% so the queries on the back cards still clear 4.5:1 against
+     the card surface — they carry the message, so they stay readable unhovered. */
+  .prompt-card::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    border-radius: inherit;
+    background: color-mix(in srgb, var(--paper) 25%, transparent);
+    opacity: var(--scrim, 0);
+    transition: opacity 260ms var(--ease);
+    pointer-events: none;
+  }
+
+  .prompt-card > * {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .prompt-card:nth-child(2) {
+    --x: 8%;
+    --y: 40px;
+    --scrim: 1;
+  }
+
+  .prompt-card:nth-child(3) {
+    --x: 16%;
+    --y: 80px;
+    --scrim: 1;
+  }
+
+  /* Each card lifts clear of the one in front of it. */
+  .prompt-card:nth-child(1):hover {
+    --y: -32px;
+  }
+
+  .prompt-card:nth-child(2):hover {
+    --y: 4px;
+  }
+
+  .prompt-card:nth-child(3):hover {
+    --y: 44px;
+  }
+
+  .prompt-card:hover {
+    --scrim: 0;
+    border-color: var(--signal);
+    z-index: 3;
+  }
+
+  .prompt-card-icon {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--signal);
+    color: var(--surface);
+  }
+
+  .prompt-card-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .prompt-card-platform {
+    font: 500 0.6875rem/1.5 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .prompt-card-query {
+    color: var(--inverse-on);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+
+  .prompt-card-date {
+    color: var(--inverse-muted);
+    font: 500 0.625rem/1.6 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* Below the split, the skewed stack would overflow the viewport. Unstack it
+     into a plain column and drop the skew entirely. */
+  @media (max-width: 720px) {
+    .prompt-stack {
+      padding-bottom: 0;
+    }
+
+    .prompt-cards {
+      grid-template-areas: none;
+      gap: var(--s2);
+    }
+
+    .prompt-card,
+    .prompt-card:nth-child(n) {
+      grid-area: auto;
+      width: 100%;
+      height: auto;
+      gap: var(--s1);
+      --x: 0;
+      --y: 0;
+      --scrim: 0;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .prompt-card,
+    .prompt-card::before {
+      transition-duration: 1ms;
+    }
+  }
+</style>
