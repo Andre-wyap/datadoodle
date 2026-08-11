@@ -1,0 +1,128 @@
+{/* Technical grid: a static ruled field with a canvas above it that lights
+    Signal Red cells under the pointer. Fixed to the viewport, so wherever it
+    sits in the markup it reads as the page's first-section backdrop. Desktop
+    only — mobile and reduced-motion never attach the paint listener. */}
+<div class="grid-bg" aria-hidden="true"></div>
+<canvas class="pixels" data-pixels aria-hidden="true"></canvas>
+
+<script>
+  const canvas = document.querySelector("[data-pixels]");
+  const ctx = canvas instanceof HTMLCanvasElement ? canvas.getContext("2d") : null;
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const isMobile = window.matchMedia("(max-width: 720px)").matches;
+
+  if (canvas instanceof HTMLCanvasElement && ctx && !reducedMotion.matches && !isMobile) {
+    const CELL = 26;
+    const DECAY = 0.03;
+    const cells = new Map<number, number>();
+    let cols = 0;
+    let rows = 0;
+    let pixelFrame = 0;
+
+    const size = () => {
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.ceil(window.innerWidth * ratio);
+      canvas.height = Math.ceil(window.innerHeight * ratio);
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      cols = Math.ceil(window.innerWidth / CELL);
+      rows = Math.ceil(window.innerHeight / CELL);
+      cells.clear();
+    };
+
+    const paint = () => {
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      cells.forEach((level, key) => {
+        const next = level - DECAY;
+        if (next <= 0.02) {
+          cells.delete(key);
+          return;
+        }
+        cells.set(key, next);
+        const col = key % cols;
+        const row = (key - col) / cols;
+        const x = col * CELL;
+        const y = row * CELL;
+
+        ctx.fillStyle = `rgba(17, 17, 17, ${next * 0.08})`;
+        ctx.fillRect(x, y, CELL - 1, CELL - 1);
+
+        if ((col * 31 + row * 17) % 9 === 0) {
+          const mark = Math.round(CELL * 0.3);
+          const offset = Math.round((CELL - 1 - mark) / 2);
+          ctx.fillStyle = `rgba(226, 30, 53, ${next * 0.45})`;
+          ctx.fillRect(x + offset, y + offset, mark, mark);
+        }
+      });
+      pixelFrame = cells.size ? requestAnimationFrame(paint) : 0;
+    };
+
+    const spread = [
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+      [1, 1],
+      [-1, -1],
+      [1, -1],
+      [-1, 1],
+    ];
+
+    const light = (x: number, y: number, strength: number) => {
+      const col = Math.floor(x / CELL);
+      const row = Math.floor(y / CELL);
+      const patch: number[][] = [[0, 0]];
+      for (let n = 0; n < 4; n++) patch.push(spread[Math.floor(Math.random() * spread.length)]);
+
+      patch.forEach(([dx, dy], index) => {
+        const c = col + dx;
+        const r = row + dy;
+        if (c < 0 || r < 0 || c >= cols || r >= rows) return;
+        const key = r * cols + c;
+        const add = index === 0 ? strength : strength * 0.5;
+        cells.set(key, Math.min(1, (cells.get(key) || 0) + add));
+      });
+
+      if (!pixelFrame) pixelFrame = requestAnimationFrame(paint);
+    };
+
+    size();
+
+    let resizeTimer = 0;
+    window.addEventListener("resize", () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(size, 150);
+    });
+
+    document.addEventListener(
+      "pointermove",
+      (event) => {
+        if (event.pointerType !== "mouse") return;
+        light(event.clientX, event.clientY, 0.8);
+      },
+      { passive: true },
+    );
+  }
+</script>
+
+<style>
+  .grid-bg {
+    position: fixed;
+    z-index: -2;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(17, 17, 17, 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(17, 17, 17, 0.045) 1px, transparent 1px);
+    background-size: 26px 26px;
+    pointer-events: none;
+  }
+
+  @media (max-width: 720px) {
+    .grid-bg {
+      background-size: 22px 22px;
+    }
+
+    .pixels {
+      display: none !important;
+    }
+  }
+</style>

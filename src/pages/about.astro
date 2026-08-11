@@ -1,0 +1,110 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import PixelField from "../components/PixelField.astro";
+---
+
+<BaseLayout
+  title="About — DataDoodles"
+  description="DataDoodles rebuilds SME websites in Malaysia and Singapore so they get found in Google and in AI search — ChatGPT, Perplexity, Gemini and AI Overviews. Rigorous data, drawn by hand."
+>
+  <SiteHeader />
+
+  <main>
+    <section class="section about-hero" aria-labelledby="about-title">
+      <PixelField />
+      <div class="shell">
+        <p class="eyebrow"><span>About DataDoodles</span></p>
+        <h1 id="about-title">Rigorous data, drawn by hand.</h1>
+        <p class="about-lede">
+          Data is the substance. Doodles are the delivery. We're serious about outcomes, unserious about ourselves.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="about-what-title">
+      <div class="shell">
+        <div class="prose">
+          <p>
+            DataDoodles rebuilds Malaysian and Singaporean SME websites so they get found in Google <em>and</em> in
+            AI search — ChatGPT, Perplexity, Gemini, and Google's AI Overview. Most business websites were built for
+            a search engine that ranks ten blue links. That engine is no longer the only one that matters: AI models
+            now answer a question directly, naming one business, maybe three. No page two.
+          </p>
+
+          <h2>Who we work with</h2>
+          <p>
+            Clinics, law firms, professional services, education providers, and specialist trades in the Klang
+            Valley and across Singapore — established businesses that already have customers and reviews, and a
+            website that reflects neither. Typically RM500k–RM10m in revenue, run by owners who are busy running
+            the business, not managing a website.
+          </p>
+
+          <h2>Why the name</h2>
+          <p>
+            The underlying page is a precision instrument: schema markup, entity structure, page speed, semantic
+            HTML — the unglamorous technical work that determines whether an AI model can understand and cite a
+            business at all. The "doodle" is what sits on top of that: a hand-drawn mark circling the moment your
+            business gets named in an AI answer, the same way a consultant marks up a report in front of you.
+            Rigorous underneath. Legible on the surface.
+          </p>
+
+          <h2>How we work</h2>
+          <p>
+            We publish our prices. We refuse to guarantee rankings — anyone who does is guessing. And we turn away
+            businesses that aren't a good fit rather than take the engagement anyway. The typical project runs
+            about 30 days from kickoff to a before-and-after report: what each AI platform said about your business
+            before we started, and what it says now.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta" aria-labelledby="about-cta-title">
+      <div class="shell about-cta">
+        <p class="eyebrow"><span>See it in detail</span></p>
+        <h2 id="about-cta-title">See what happened for businesses like yours.</h2>
+        <a class="hero-cta" href="/case-study">
+          See the case studies <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  .about-hero {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .about-hero h1 {
+    max-width: 16ch;
+    margin-top: var(--s5);
+  }
+
+  .about-lede {
+    max-width: 56ch;
+    margin-top: var(--s5);
+    color: var(--muted);
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+
+  .about-cta {
+    max-width: 60ch;
+    text-align: left;
+  }
+
+  .about-cta h2 {
+    max-width: 20ch;
+    margin-top: var(--s3);
+  }
+
+  .about-cta .hero-cta {
+    margin-top: var(--s6);
+  }
+</style>

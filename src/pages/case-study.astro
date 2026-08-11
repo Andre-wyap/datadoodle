@@ -1,0 +1,508 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import PixelField from "../components/PixelField.astro";
+import { getCaseStudies } from "../data/case-studies";
+
+const cases = await getCaseStudies();
+---
+
+<BaseLayout
+  title="Case Studies — DataDoodles"
+  description="Real businesses named and cited by ChatGPT, Perplexity, Gemini, Claude and Google AI Overviews. Every screenshot is dated and shows exactly what happened on that day."
+>
+  <SiteHeader />
+
+  <main>
+    <section class="section case-hero" aria-labelledby="case-hero-title">
+      <PixelField />
+      <div class="shell">
+        <p class="eyebrow"><span>Evidence</span></p>
+        <h1 id="case-hero-title">Rank like our clients.</h1>
+        <p class="case-hero-sub">
+          We've helped more than 70 businesses get found on Google and in AI search results — including ChatGPT,
+          Gemini, Perplexity, Claude and Google AI Overviews. Every screenshot below is dated and shows exactly
+          what happened on that day.
+        </p>
+        <a class="hero-cta" href="/#visibility-check">
+          Get your quote <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="section case-grid-section" aria-labelledby="case-hero-title">
+      <div class="shell">
+        <ul class="case-grid" role="list">
+          {
+            cases.map((item) => (
+              <li
+                class="case"
+                data-proof
+                data-proof-src={item.shot.src}
+                data-proof-company={item.company}
+                data-proof-query={item.query}
+                data-proof-platform={item.platform}
+                data-proof-verified={item.verified}
+                data-proof-caveat={item.caveat || ""}
+              >
+                <figure class="case-shot">
+                  <img
+                    src={item.shot.src}
+                    alt={`${item.platform} answering “${item.query}”, with ${item.named}. Captured ${item.verified}.`}
+                    width={item.shot.width}
+                    height={item.shot.height}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </figure>
+
+                <div class="case-body">
+                  <p class="case-platform">{item.platform}</p>
+                  <h2>{item.company}</h2>
+                  <p class="case-industry">{item.industry}</p>
+                  <p class="case-result">{item.result}</p>
+
+                  <dl class="record">
+                    <div>
+                      <dt>Query</dt>
+                      <dd>{item.query}</dd>
+                    </div>
+                    <div>
+                      <dt>Verified</dt>
+                      <dd>{item.verified}</dd>
+                    </div>
+                    <div>
+                      <dt>Result type</dt>
+                      <dd>{item.resultType}</dd>
+                    </div>
+                  </dl>
+
+                  {item.caveat && <p class="case-caveat">{item.caveat}</p>}
+
+                  <button type="button" class="proof-action">
+                    View case study <span aria-hidden="true">→</span>
+                  </button>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section class="final-cta" aria-labelledby="case-cta-title">
+      <div class="shell case-cta">
+        <p class="eyebrow"><span>Get your quote</span></p>
+        <h2 id="case-cta-title">Want results like these?</h2>
+        <a class="hero-cta" href="/#visibility-check">
+          Get your quote <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+
+  {/* Proof lightbox. One dialog, filled from whichever card was pressed —
+      native <dialog>, so Escape and focus-trapping come for free. */}
+  <dialog class="proof-modal" id="proof-modal" data-proof-modal aria-labelledby="proof-modal-title">
+    <button type="button" class="proof-modal-close" data-close-proof aria-label="Close">✕</button>
+    <h2 id="proof-modal-title" data-proof-title></h2>
+    <img data-proof-image alt="" />
+    <dl class="record">
+      <div>
+        <dt>Query</dt>
+        <dd data-proof-query></dd>
+      </div>
+      <div>
+        <dt>Platform</dt>
+        <dd data-proof-platform></dd>
+      </div>
+      <div>
+        <dt>Date verified</dt>
+        <dd data-proof-verified></dd>
+      </div>
+    </dl>
+    {/* Filled only for the captures that are known to move between runs. */}
+    <p class="proof-modal-caveat" data-proof-caveat hidden></p>
+    <p class="proof-modal-note">
+      A point-in-time capture. AI answers vary by phrasing, location and model version, and change without notice. This
+      shows what the platform returned on the date above.
+    </p>
+  </dialog>
+
+  <script>
+    // Proof lightbox --------------------------------------------------------
+    const proofModal = document.querySelector("[data-proof-modal]");
+    if (proofModal instanceof HTMLDialogElement) {
+      const image = proofModal.querySelector("[data-proof-image]");
+      const fill = (selector: string, value: string) => {
+        const node = proofModal.querySelector(selector);
+        if (node) node.textContent = value;
+      };
+
+      document.querySelectorAll("[data-proof]").forEach((trigger) => {
+        trigger.addEventListener("click", () => {
+          const src = trigger.getAttribute("data-proof-src") || "";
+          const company = trigger.getAttribute("data-proof-company") || "";
+          const platform = trigger.getAttribute("data-proof-platform") || "";
+          const query = trigger.getAttribute("data-proof-query") || "";
+          const verified = trigger.getAttribute("data-proof-verified") || "";
+          const caveat = trigger.getAttribute("data-proof-caveat") || "";
+
+          if (image instanceof HTMLImageElement) {
+            image.src = src;
+            image.alt = `${platform} answering “${query}” and naming ${company}. Captured ${verified}.`;
+          }
+          fill("[data-proof-title]", company);
+          fill("[data-proof-query]", query);
+          fill("[data-proof-platform]", platform);
+          fill("[data-proof-verified]", verified);
+
+          // Per-capture caveat sits above the standing point-in-time note, and
+          // is hidden entirely for the results that reproduce reliably.
+          const caveatNode = proofModal.querySelector("[data-proof-caveat]");
+          if (caveatNode instanceof HTMLElement) {
+            caveatNode.textContent = caveat;
+            caveatNode.hidden = !caveat;
+          }
+
+          proofModal.showModal();
+        });
+      });
+
+      proofModal.querySelectorAll("[data-close-proof]").forEach((button) => {
+        button.addEventListener("click", () => proofModal.close());
+      });
+
+      // A click landing outside the dialog's own box is a backdrop click.
+      proofModal.addEventListener("click", (event) => {
+        const rect = proofModal.getBoundingClientRect();
+        const inside =
+          event.clientX >= rect.left &&
+          event.clientX <= rect.right &&
+          event.clientY >= rect.top &&
+          event.clientY <= rect.bottom;
+        if (!inside) proofModal.close();
+      });
+    }
+  </script>
+</BaseLayout>
+
+<style>
+  .case-hero {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .case-hero h1 {
+    max-width: 16ch;
+    margin-top: var(--s5);
+  }
+
+  .case-hero-sub {
+    max-width: 62ch;
+    margin-top: var(--s5);
+    color: var(--muted);
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+
+  .case-hero .hero-cta {
+    margin-top: var(--s6);
+  }
+
+  /* Two-up, so each card keeps the same proportions it has in the /lp
+     carousel — the difference here is that every capture is on the page at
+     once rather than behind a scroll. */
+  .case-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s5);
+    margin: var(--s8) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Case cards — identical to /lp ---------------------------------------- */
+  .case {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 180ms var(--ease);
+  }
+
+  .case:hover {
+    border-color: var(--outline);
+  }
+
+  /* Fixed ratio, so every capture occupies identical height however tall the
+     source crop is. Anchored top — the model's answer starts at the top of
+     the shot, and that is the part worth showing. */
+  .case-shot {
+    position: relative;
+    flex: none;
+    margin: 0;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: var(--inverse-surface);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  /* Taken out of flow so the figure's height comes from aspect-ratio alone.
+     Left in flow, the image's own proportions win and each capture sets its
+     own height, which is what we are trying to stop. */
+  .case-shot img {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+
+  .case-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--s2);
+    padding: var(--s4);
+  }
+
+  .case-platform {
+    color: var(--data-gray);
+    font: 500 0.6875rem/1.5 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* The three variable-length fields are pinned to an exact number of lines,
+     so the record rows and the button land on the same baseline in every
+     card rather than drifting with the length of the copy. */
+  .case h2 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    min-height: calc(2 * 1.28em);
+    overflow: hidden;
+    font-size: clamp(1.15rem, 1.6vw, 1.375rem);
+    line-height: 1.28;
+    /* These are h2s here (the page's heading order needs them to be), so the
+       global section-heading tracking would apply. Reset it to the /lp value. */
+    letter-spacing: normal;
+  }
+
+  .case-industry {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    overflow: hidden;
+    color: var(--data-gray);
+    font: 500 0.75rem/1.4 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .case-result {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    min-height: calc(3 * 1.45em);
+    overflow: hidden;
+    color: var(--ink);
+    font-size: 1.0625rem;
+    font-weight: 700;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+  }
+
+  .case .record dd {
+    line-height: 1.5;
+  }
+
+  /* Only the query runs long enough to wrap; Verified and Result type are
+     one line in every card already, so pinning those too just adds dead space. */
+  .case .record > div:first-child dd {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    min-height: calc(2 * 1.5em);
+    overflow: hidden;
+  }
+
+  .case-caveat {
+    color: var(--muted);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+  }
+
+  /* Shared record + proof control ---------------------------------------- */
+  .record {
+    margin: 0;
+  }
+
+  .record > div {
+    display: grid;
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: var(--s2);
+    align-items: baseline;
+    padding-block: 12px;
+    border-top: 1px solid var(--rule-light);
+  }
+
+  .record dt {
+    color: var(--data-gray);
+    font: 500 0.6875rem/1.7 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .record dd {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9375rem;
+  }
+
+  .proof-action {
+    align-self: start;
+    margin-top: auto;
+    padding: 10px 0 4px;
+    background: none;
+    border: 0;
+    border-bottom: 2px solid var(--ink);
+    color: var(--ink);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 180ms var(--ease), border-color 180ms var(--ease);
+  }
+
+  .proof-action:hover {
+    color: var(--signal);
+    border-color: var(--signal);
+  }
+
+  .proof-action span {
+    display: inline-block;
+    margin-left: 8px;
+    transition: transform 180ms var(--ease);
+  }
+
+  .proof-action:hover span {
+    transform: translateX(3px);
+  }
+
+  /* Proof lightbox -------------------------------------------------------- */
+  .proof-modal {
+    width: min(94vw, 1000px);
+    max-height: min(90vh, 900px);
+    margin: auto;
+    padding: var(--s5);
+    overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    color: var(--ink-body);
+  }
+
+  .proof-modal::backdrop {
+    background: rgba(17, 17, 17, 0.86);
+  }
+
+  .proof-modal h2 {
+    margin: 0 var(--s6) var(--s4) 0;
+    font-size: clamp(1.25rem, 2vw, 1.5rem);
+  }
+
+  .proof-modal img {
+    width: 100%;
+    height: auto;
+    margin-bottom: var(--s4);
+    background: var(--inverse-surface);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+  }
+
+  /* A capture that moves between runs says so, in the accent reserved for
+     result marks — the claim and its limit arrive together. */
+  .proof-modal-caveat {
+    margin-top: var(--s4);
+    padding-left: var(--s3);
+    border-left: 2px solid var(--signal);
+    color: var(--ink);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.55;
+  }
+
+  .proof-modal-caveat[hidden] {
+    display: none;
+  }
+
+  .proof-modal-note {
+    margin-top: var(--s4);
+    color: var(--muted);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+  }
+
+  .proof-modal-close {
+    position: absolute;
+    top: var(--s3);
+    right: var(--s3);
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    color: var(--ink);
+    cursor: pointer;
+    transition: border-color 180ms var(--ease);
+  }
+
+  .proof-modal-close:hover {
+    border-color: var(--ink);
+  }
+
+  .case-cta {
+    max-width: 60ch;
+    text-align: left;
+  }
+
+  .case-cta h2 {
+    max-width: 16ch;
+    margin-top: var(--s3);
+  }
+
+  .case-cta .hero-cta {
+    margin-top: var(--s6);
+  }
+
+  @media (max-width: 1080px) {
+    .case-grid {
+      gap: var(--s3);
+    }
+  }
+
+  @media (max-width: 720px) {
+    .case-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .case-body {
+      padding: var(--s3);
+    }
+  }
+</style>

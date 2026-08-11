@@ -1,0 +1,2285 @@
+---
+import { Image } from "astro:assets";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import LeadForm from "../components/LeadForm.astro";
+import DisplayCards from "../components/DisplayCards.astro";
+import logoLockup from "../assets/logo-lockup.png";
+import { getCaseStudies } from "../data/case-studies";
+
+// Marquee. Each group repeats enough times to outrun the widest viewport, then
+// the whole group is duplicated once so translateX(-50%) loops seamlessly.
+const disciplines = ["CHATGPT", "GEMINI", "PERPLEXITY", "CLAUDE"];
+const promises = ["BE FOUND", "BE UNDERSTOOD", "BE RECOMMENDED"];
+const repeat = <T,>(items: T[], times: number) => Array.from({ length: times }, () => items).flat();
+
+// 02 — Why a good business still gets overlooked.
+const problems = [
+  [
+    "Search Engine Optimisation (SEO)",
+    "The Google layer. Site structure, page speed, internal linking and topic coverage, so the pages you already have rank for what your customers actually type. It is the foundation the other two stand on: a model cannot cite a page a crawler never understood.",
+  ],
+  [
+    "Generative Engine Optimisation (GEO)",
+    "ChatGPT, Gemini, Perplexity and AI Overviews don't rank ten blue links. They name one business, maybe three. We structure your entity, schema and proof so a model can state what you do, who you do it for and where you operate, then name you when someone asks for a recommendation.",
+  ],
+  [
+    "Answer Engine Optimisation (AEO)",
+    "Featured snippets, People Also Ask, voice assistants and Google Maps all pull a single direct answer. We write and mark up your pages so the answer they pull is yours: real questions, plain answers, details a machine can verify.",
+  ],
+];
+
+// 03 — What we do about it.
+const solutions = [
+  ["Be found", "We check where you appear today across Google, ChatGPT, Gemini and Perplexity, and where your competitors appear instead."],
+  ["Be understood", "We structure and label your business so a model can state what you do, who you do it for, and where you operate."],
+  ["Be trusted", "Real proof, in a form a model can read and reuse: case studies, credentials, reviews and answered objections."],
+  ["Be recommended", "We re-test the same questions after the work lands, and report what changed on each platform."],
+];
+
+// 01 — Case studies, carried by the carousel. One shape for all six so every
+// card renders identically: the platform that produced the answer, the exact
+// question asked, what the model did, and the date it was true. `caveat` is
+// null when the result held steady across runs — it is not padding, and an
+// empty one must stay empty rather than be filled with reassurance.
+const cases = await getCaseStudies();
+
+// 05 — Benefits.
+const benefits = [
+  ["Get discovered earlier", "Appear during the customer’s research process."],
+  ["Build trust before contact", "Being referenced by AI can strengthen credibility."],
+  ["Support your advertising", "Meta ads create awareness. AI visibility supports research and trust."],
+  ["Move before competitors", "Improve your visibility before the market becomes crowded."],
+];
+
+// 06 — How it works.
+const stages = [
+  ["Audit", "We record where you appear today across each major AI platform, and audit up to three named competitors appearing instead of you."],
+  ["Identify", "Our in-house AI tools identify the gaps: missing keywords, unclear information, questions your site never answers."],
+  ["Improve", "We rebuild your website, or build on top of what you already have, so a model can understand and cite your business."],
+  ["Deploy", "Your new site goes live within 30 days, structured, tested, and ready to be found."],
+  [
+    "Report",
+    "You get the before and after, per platform, with the exact wording each model used to describe you, plus the fixes still worth making next.",
+  ],
+];
+
+// 08 — Who this suits. Alternating fills give the grid its rhythm.
+const industries = [
+  "Professional services",
+  "Consultancy",
+  "Healthcare",
+  "Education",
+  "Events",
+  "Home services",
+  "Financial services",
+  "Local businesses",
+];
+
+// 15 — FAQ.
+const faqs = [
+  [
+    "What is AI search optimisation?",
+    "It is the work of making your business understandable and citable by AI systems, so that when someone asks ChatGPT, Gemini, Perplexity or Google’s AI Overview for a recommendation, your business is one of the names it has to give.",
+  ],
+  [
+    "Is this the same as SEO?",
+    "Related, but not the same job. SEO optimises for a position in a list of links. This optimises for being named inside an answer, where there is no page two and usually no more than three names.",
+  ],
+  [
+    "How long does it take?",
+    "The typical engagement runs about 30 days from kickoff to the final report. Audit and Identify take the first week; Improve and Deploy take the rest.",
+  ],
+  [
+    "Can you guarantee placement?",
+    "No, and be careful with anyone who does. AI answers vary by phrasing, location and model version, and they change without notice. What we guarantee is the work, the testing, and an honest before-and-after record of what we found.",
+  ],
+  [
+    "How will I know whether it is working?",
+    "We re-run the same questions on the same platforms after the work lands, and show you the answers side by side with dates. You see the wording the model used, not a number we made up.",
+  ],
+  [
+    "Do I still need a website?",
+    "Yes. Your website is where the models read from. If it does not clearly state what you do, who you serve and where, there is nothing for an answer to be built from.",
+  ],
+  [
+    "Do I still need Meta ads?",
+    "If they work for you, keep them. Ads create awareness; AI visibility supports the research and trust step that happens after. They do different jobs.",
+  ],
+  [
+    "Which AI platforms do you work with?",
+    "ChatGPT, Google AI Overview, Gemini and Perplexity. Each is checked and reported separately, because the same question can produce four different answers.",
+  ],
+];
+
+const navLinks: [string, string][] = [
+  ["/", "Home"],
+  ["/about", "About"],
+  ["/case-study", "Case Study"],
+  ["/blog", "Blog"],
+  ["/contact", "Contact"],
+];
+
+// A fixed field of Signal Red cells over the background grid. Seeded, so the
+// scatter is identical on every render and never re-flows the page.
+const seeded = (seed: number) => {
+  let value = seed;
+  return () => {
+    value = (value * 1664525 + 1013904223) % 4294967296;
+    return value / 4294967296;
+  };
+};
+const nextMark = seeded(20260731);
+const gridMarks = Array.from({ length: 16 }, () => ({
+  left: Math.round(nextMark() * 96 * 100) / 100,
+  top: Math.round(nextMark() * 96 * 100) / 100,
+}));
+
+const schema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["Organization", "LocalBusiness"],
+      "@id": "https://datadoodles.my/#organization",
+      name: "DataDoodles",
+      url: "https://datadoodles.my/",
+      areaServed: { "@type": "AdministrativeArea", name: "Klang Valley, Malaysia" },
+      description:
+        "DataDoodles measures how AI sees your business and improves your chance of becoming the recommended answer on ChatGPT, Google AI Overview, Gemini and Perplexity.",
+    },
+    {
+      "@type": "Service",
+      name: "GEO / AI Search Visibility",
+      serviceType: "Generative Engine Optimisation",
+      provider: { "@id": "https://datadoodles.my/#organization" },
+      areaServed: "Malaysia",
+      audience: { "@type": "BusinessAudience", audienceType: "Established small and medium businesses" },
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://datadoodles.my/#faq",
+      mainEntity: faqs.map(([question, answer]) => ({
+        "@type": "Question",
+        name: question,
+        acceptedAnswer: { "@type": "Answer", text: answer },
+      })),
+    },
+  ],
+};
+
+const whatsappNumber = import.meta.env.PUBLIC_WHATSAPP_NUMBER;
+const whatsappUrl = whatsappNumber
+  ? `https://wa.me/${whatsappNumber.replace(/\D/g, "")}?text=Hi%20DataDoodles%2C%20I%27d%20like%20to%20work%20with%20you.`
+  : "#visibility-check";
+---
+
+<BaseLayout
+  title="DataDoodles — Become the business AI recommends"
+  description="We measure how ChatGPT, Google AI Overview, Gemini and Perplexity see your business, and improve your chance of being the recommended answer. Typical timeline: 30 days."
+>
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} slot="head" />
+
+  <header class="site-header" id="top" data-header>
+    <div class="shell">
+      <a class="brand" href="/" aria-label="DataDoodles home">
+        <Image src={logoLockup} alt="DataDoodles" width={278} height={52} loading="eager" />
+      </a>
+
+      <nav class="site-nav" aria-label="Sections">
+        <ul>
+          {navLinks.map(([href, label]) => <li><a href={href}>{label}</a></li>)}
+        </ul>
+      </nav>
+
+      <a class="header-action" href="#visibility-check">
+        Get your quote <span aria-hidden="true">→</span>
+      </a>
+
+      {/* Hidden from the desktop layout in CSS, so one set of markup serves both. */}
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-panel" data-nav-toggle>
+        <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="sr-only" data-nav-toggle-label>Open menu</span>
+      </button>
+    </div>
+
+    <div class="nav-panel" id="nav-panel" data-nav-panel>
+      <nav class="shell" aria-label="Sections menu">
+        <ul>
+          {navLinks.map(([href, label]) => <li><a href={href}>{label}</a></li>)}
+        </ul>
+        <a class="nav-panel-cta" href="#visibility-check">Get your quote</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero — 7 columns of copy, 5 columns of evidence ------------------- -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="shell">
+        <div class="hero-grid">
+          <div>
+            <p class="hero-kicker" data-anim>Let Your Website Be Seen by AI</p>
+            <h1 id="hero-title">
+              <span class="accent">
+                <span class="w" style="--i:0">AI</span> <span class="w" style="--i:1">Recommend</span>
+              </span>
+              <span class="w" style="--i:2">=</span>
+              <span class="w" style="--i:3">More</span>
+              <span class="w" style="--i:4">Traffic</span>
+              <span class="w" style="--i:5">=</span>
+              <span class="hl">
+                <span class="w" style="--i:6">More</span> <span class="w" style="--i:7">Sales</span>
+              </span>
+            </h1>
+            <p class="hero-subhead" data-anim style="--delay:260ms">Become the Business AI Recommends in 30 Days</p>
+            <p class="hero-sub" data-anim style="--delay:300ms">
+              Your customers are asking ChatGPT, Gemini, Perplexity and Google’s AI Overview who to choose.
+            </p>
+
+            <div class="hero-actions" data-anim style="--delay:380ms">
+              <a class="hero-cta" href="#visibility-check">
+                Get your quote <span aria-hidden="true">→</span>
+              </a>
+              <a class="hero-link" href="#results">Our work</a>
+            </div>
+          </div>
+
+          <div class="hero-exhibit" data-anim style="--delay:200ms">
+            <p class="exhibit-label">Your potential clients are searching</p>
+            <DisplayCards />
+          </div>
+        </div>
+      </div>
+
+      <p class="sr-only">
+        DataDoodles works on Generative Engine Optimisation, Answer Engine Optimisation and Search Engine Optimisation.
+      </p>
+
+      <!-- Hero marquee — full-bleed, dark ------------------------------------ -->
+      <div class="marquee marquee--dark" aria-hidden="true">
+        <div class="marquee-row marquee-row--lead">
+          <div class="marquee-track" style="--speed:96s">
+            {
+              [0, 1].map(() => (
+                <div class="marquee-group">
+                  {repeat(disciplines, 3).map((word) => (
+                    <span class="marquee-word">{word}</span>
+                  ))}
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="marquee-row marquee-row--sub">
+          <div class="marquee-track marquee-track--reverse" style="--speed:72s">
+            {
+              [0, 1].map(() => (
+                <div class="marquee-group">
+                  {repeat(promises, 8).map((phrase) => (
+                    <span class="marquee-word">{phrase}</span>
+                  ))}
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 01 Case-study proof — horizontal carousel -------------------------- -->
+    <section class="section" id="results" aria-labelledby="results-title">
+      <div class="shell">
+        <div class="section-head section-head--wide" data-reveal>
+          <p class="eyebrow"><span>Evidence</span><span class="eyebrow-idx">01</span></p>
+          <h2 id="results-title">Rank Like Our Clients</h2>
+          <p class="lede">
+            We've helped more than 70 businesses get found on Google and in AI search results — including ChatGPT,
+            Gemini, Perplexity, Claude and Google AI Overviews. Every screenshot below is dated and shows exactly
+            what happened on that day.
+          </p>
+          <a class="hero-cta results-cta" href="#visibility-check">
+            Get your quote <span aria-hidden="true">→</span>
+          </a>
+        </div>
+
+        <div class="carousel" data-carousel data-reveal>
+          <div class="carousel-controls">
+            <button type="button" class="carousel-arrow" data-carousel-prev aria-label="Previous case studies">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+            <button type="button" class="carousel-arrow" data-carousel-next aria-label="Next case studies">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
+          </div>
+
+          {/* The track is the scroll container, so it works by swipe and trackpad
+              with the arrows off. tabindex makes it keyboard-scrollable too. */}
+          <ul class="carousel-track" data-carousel-track tabindex="0" role="list" aria-label="Case studies">
+            {
+              cases.map((item) => (
+                <li
+                  class="case"
+                  data-proof
+                  data-proof-src={item.shot.src}
+                  data-proof-company={item.company}
+                  data-proof-query={item.query}
+                  data-proof-platform={item.platform}
+                  data-proof-verified={item.verified}
+                  data-proof-caveat={item.caveat || ""}
+                >
+                  <figure class="case-shot">
+                    <img
+                      src={item.shot.src}
+                      alt={`${item.platform} answering “${item.query}”, with ${item.named}. Captured ${item.verified}.`}
+                      width={item.shot.width}
+                      height={item.shot.height}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </figure>
+
+                  <div class="case-body">
+                    <p class="case-platform">{item.platform}</p>
+                    <h3>{item.company}</h3>
+                    <p class="case-industry">{item.industry}</p>
+                    <p class="case-result">{item.result}</p>
+
+                    <dl class="record">
+                      <div>
+                        <dt>Query</dt>
+                        <dd>{item.query}</dd>
+                      </div>
+                      <div>
+                        <dt>Verified</dt>
+                        <dd>{item.verified}</dd>
+                      </div>
+                      <div>
+                        <dt>Result type</dt>
+                        <dd>{item.resultType}</dd>
+                      </div>
+                    </dl>
+
+                    {item.caveat && <p class="case-caveat">{item.caveat}</p>}
+
+                    <button type="button" class="proof-action">
+                      View case study <span aria-hidden="true">→</span>
+                    </button>
+                  </div>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 Problem --------------------------------------------------------- -->
+    <section class="section" aria-labelledby="problem-title">
+      <div class="shell">
+        <div class="split-grid">
+          <div data-reveal>
+            <p class="eyebrow"><span>Our services</span><span class="eyebrow-idx">02</span></p>
+            <h2 id="problem-title">We get your website shown in 3 places.</h2>
+            <a class="hero-cta section-cta" href="#visibility-check">
+              Get your quote <span aria-hidden="true">→</span>
+            </a>
+          </div>
+
+          <div class="problem-stack">
+            {
+              problems.map(([title, copy], i) => (
+                <article class="dark-card" data-reveal style={`--i:${i}`}>
+                  <p class="dark-card-idx">{String(i + 1).padStart(2, "0")}</p>
+                  <h3>{title}</h3>
+                  <p>{copy}</p>
+                </article>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 Solution -------------------------------------------------------- -->
+    <section class="section section--white" aria-labelledby="solution-title">
+      <div class="shell">
+        <div class="section-head section-head--wide" data-reveal>
+          <p class="eyebrow"><span>What we do</span><span class="eyebrow-idx">03</span></p>
+          <h2 id="solution-title">We help your business become part of the answer.</h2>
+          <a class="hero-cta section-cta" href="#visibility-check">
+            Get your quote <span aria-hidden="true">→</span>
+          </a>
+        </div>
+
+        <div class="col-grid solution-grid">
+          {
+            solutions.map(([title, copy], i) => (
+              <article class="col solution" data-reveal style={`--i:${i}`}>
+                <p class="step-no">{String(i + 1).padStart(2, "0")}</p>
+                <h3>{title}</h3>
+                <p>{copy}</p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 Benefits -------------------------------------------------------- -->
+    <section class="section" aria-labelledby="benefits-title">
+      <div class="shell">
+        <div class="section-head section-head--wide" data-reveal>
+          <p class="eyebrow"><span>What it gets you</span><span class="eyebrow-idx">04</span></p>
+          <h2 id="benefits-title">Why this matters now.</h2>
+          <a class="hero-cta section-cta" href="#visibility-check">
+            Get your quote <span aria-hidden="true">→</span>
+          </a>
+        </div>
+
+        <div class="benefit-grid">
+          {
+            benefits.map(([title, copy], i) => (
+              <article class="dark-card dark-card--benefit" data-reveal style={`--i:${i % 2}`}>
+                <p class="dark-card-idx">{String(i + 1).padStart(2, "0")}</p>
+                <h3>{title}</h3>
+                <p>{copy}</p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 How it works ---------------------------------------------------- -->
+    <section class="section section--low" id="how-it-works" aria-labelledby="how-title">
+      <div class="shell">
+        <div class="section-head section-head--wide" data-reveal>
+          <p class="eyebrow"><span>The process</span><span class="eyebrow-idx">05</span></p>
+          <h2 id="how-title">Five stages. One clear record at the end.</h2>
+        </div>
+
+        <div class="how-grid">
+          <div class="timeline stage-timeline" data-reveal>
+            <ol>
+              {
+                stages.map(([title, copy], i) => (
+                  <li style={`--i:${i}`}>
+                    <span class="node" aria-hidden="true" />
+                    <p class="week">{String(i + 1).padStart(2, "0")}</p>
+                    <h3>{title}</h3>
+                    <p>{copy}</p>
+                  </li>
+                ))
+              }
+            </ol>
+          </div>
+
+          <aside class="how-aside" data-reveal>
+            <p class="how-aside-label">Typical timeline</p>
+            <p class="how-aside-figure">30<span>days</span></p>
+            <p class="how-aside-note">
+              Approximately. Audit and Identify run in the first week; Improve and Deploy take the rest. You get the
+              report whether or not the answers moved.
+            </p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 Suitable business types ----------------------------------------- -->
+    <section class="section" aria-labelledby="industries-title">
+      <div class="shell">
+        <div class="section-head section-head--wide" data-reveal>
+          <p class="eyebrow"><span>Who this suits</span><span class="eyebrow-idx">06</span></p>
+          <h2 id="industries-title">Businesses customers research before they call.</h2>
+          <a class="hero-cta section-cta" href="#visibility-check">
+            Get your quote <span aria-hidden="true">→</span>
+          </a>
+        </div>
+
+        <ul class="industry-grid">
+          {
+            industries.map((label, i) => (
+              <li class="industry" data-reveal style={`--i:${i % 4}`}>
+                <span class="industry-no">{String(i + 1).padStart(2, "0")}</span>
+                <span class="industry-name">{label}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <!-- 08 Lead form — full-bleed, inverted -------------------------------- -->
+    <section class="lead-section" id="visibility-check" aria-labelledby="lead-title">
+      <div class="shell">
+        <div class="lead-grid">
+          <div data-reveal>
+            <p class="eyebrow"><span>Visibility check</span><span class="eyebrow-idx">07</span></p>
+            <h2 id="lead-title">Want to work with us?</h2>
+            <p class="lede">
+              We run your business through ChatGPT, Gemini, Perplexity and Google’s AI Overview, record what comes back,
+              and show you who is appearing instead of you.
+            </p>
+
+            <ul class="lead-benefits">
+              <li>See exactly what AI says about you today</li>
+              <li>See which competitors get named first</li>
+              <li>See the gaps worth fixing first</li>
+            </ul>
+
+            <p class="lead-process">Typical timeline: approximately 30 days</p>
+          </div>
+
+          <div class="panel" data-reveal>
+            <span class="panel-label">Work With Us</span>
+            <LeadForm source="footer" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 FAQ -------------------------------------------------------------- -->
+    <section class="section" id="faq" aria-labelledby="faq-title">
+      <div class="shell">
+        <div class="section-head" data-reveal>
+          <p class="eyebrow"><span>Questions</span><span class="eyebrow-idx">08</span></p>
+          <h2 id="faq-title">Straight answers.</h2>
+        </div>
+
+        <div class="faq" data-reveal>
+          {
+            faqs.map(([question, answer]) => (
+              <details>
+                <summary>
+                  {question}
+                  <span class="chev" aria-hidden="true" />
+                </summary>
+                <p>{answer}</p>
+              </details>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA — full-bleed, inverted ----------------------------------- -->
+    <section class="closing" aria-labelledby="closing-title">
+      <div class="closing-grid" aria-hidden="true">
+        {gridMarks.map((mark) => <i style={`left:${mark.left}%;top:${mark.top}%`} />)}
+      </div>
+
+      <div class="shell">
+        <h2 id="closing-title" data-reveal>
+          Your customers are already asking AI who to choose.
+        </h2>
+        <p class="closing-sub" data-reveal>
+          The question is whether your business <span class="hl hl--closing">appears in the answer</span>.
+        </p>
+        <a class="closing-cta" href="#visibility-check" data-reveal>
+          Get your quote <span aria-hidden="true">→</span>
+        </a>
+        <p class="closing-note" data-reveal>30-day process · Clear reporting · Real point-in-time proof</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer site-footer--dark">
+    <div class="shell">
+      <div class="footer-brand">
+        <a class="brand" href="/" aria-label="DataDoodles home">
+          <Image src={logoLockup} alt="DataDoodles" width={278} height={52} loading="lazy" />
+        </a>
+        <p class="footer-line">GEO / AI Search Visibility</p>
+      </div>
+
+      <nav class="footer-nav" aria-label="Footer">
+        <ul>
+          {navLinks.map(([href, label]) => <li><a href={href}>{label}</a></li>)}
+          <li><a href="#visibility-check">Get your quote</a></li>
+        </ul>
+      </nav>
+
+      <div class="footer-contact">
+        <p><a href="mailto:hello@datadoodles.my">hello@datadoodles.my</a></p>
+        {whatsappNumber && <p><a href={whatsappUrl}>WhatsApp</a></p>}
+        <p>Klang Valley, Malaysia</p>
+      </div>
+
+      <div class="footer-legal">
+        <p class="footer-stamp">Built for how customers search next</p>
+        <p>
+          <a href="/privacy">Privacy policy</a> · <a href="/terms">Terms</a> · © {new Date().getFullYear()} DataDoodles
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  {/* Proof lightbox. One dialog, filled from whichever View Proof control was
+      pressed — native <dialog>, so Escape and focus-trapping come for free. */}
+  <dialog class="proof-modal" id="proof-modal" data-proof-modal aria-labelledby="proof-modal-title">
+    <button type="button" class="proof-modal-close" data-close-proof aria-label="Close">✕</button>
+    <h2 id="proof-modal-title" data-proof-title></h2>
+    <img data-proof-image alt="" />
+    <dl class="record">
+      <div>
+        <dt>Query</dt>
+        <dd data-proof-query></dd>
+      </div>
+      <div>
+        <dt>Platform</dt>
+        <dd data-proof-platform></dd>
+      </div>
+      <div>
+        <dt>Date verified</dt>
+        <dd data-proof-verified></dd>
+      </div>
+    </dl>
+    {/* Filled only for the captures that are known to move between runs. */}
+    <p class="proof-modal-caveat" data-proof-caveat hidden></p>
+    <p class="proof-modal-note">
+      A point-in-time capture. AI answers vary by phrasing, location and model version, and change without notice. This
+      shows what the platform returned on the date above.
+    </p>
+  </dialog>
+
+  {/* Custom pointer. Only switched on for fine pointers, and only by script,
+      so the native cursor is never hidden without a replacement. */}
+  <div class="cursor-ring" data-cursor-ring aria-hidden="true"></div>
+  <div class="cursor-dot" data-cursor-dot aria-hidden="true"></div>
+
+  {/* Technical grid: a static ruled field with a deterministic scatter of
+      Signal Red cells, and a canvas above it that lights under the pointer. */}
+  <div class="grid-bg" aria-hidden="true"></div>
+  <canvas class="pixels" data-pixels aria-hidden="true"></canvas>
+
+  <script>
+    // Case-study carousel ---------------------------------------------------
+    // The track scrolls on its own by swipe, trackpad and keyboard; the arrows
+    // are an addition on top of that, so losing this script costs the arrows
+    // and nothing else.
+    const carouselReduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    document.querySelectorAll("[data-carousel]").forEach((root) => {
+      const track = root.querySelector("[data-carousel-track]");
+      const prev = root.querySelector("[data-carousel-prev]");
+      const next = root.querySelector("[data-carousel-next]");
+      if (!(track instanceof HTMLElement) || !(prev instanceof HTMLButtonElement) || !(next instanceof HTMLButtonElement))
+        return;
+
+      // Measured live rather than hardcoded, so the same code serves the
+      // two-up desktop track and the one-up mobile one across a resize.
+      const page = () => {
+        const card = track.firstElementChild;
+        if (!(card instanceof HTMLElement)) return track.clientWidth;
+
+        const style = getComputedStyle(track);
+        const gap = parseFloat(style.columnGap) || 0;
+        const stride = card.getBoundingClientRect().width + gap;
+
+        // clientWidth includes the track's own padding; the cards do not sit
+        // in it, so take it off before counting how many are on screen.
+        const inner =
+          track.clientWidth - (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0);
+        const perView = Math.max(1, Math.round((inner + gap) / stride));
+
+        // A full screen of cards per click: 1–2, then 3–4, then 5–6.
+        return stride * perView;
+      };
+
+      const scrollByPage = (direction: number) => {
+        track.scrollBy({
+          left: direction * page(),
+          behavior: carouselReduceMotion.matches ? "auto" : "smooth",
+        });
+      };
+
+      // Snap aligns the first card's edge to the scrollport, so the resting
+      // "start" is the track's own left padding rather than 0. Compare against
+      // that, or the prev arrow never reads as disabled on load.
+      const sync = () => {
+        const start = parseFloat(getComputedStyle(track).paddingLeft) || 0;
+        const max = track.scrollWidth - track.clientWidth;
+        prev.disabled = track.scrollLeft <= start + 1;
+        next.disabled = track.scrollLeft >= max - 1;
+      };
+
+      prev.addEventListener("click", () => scrollByPage(-1));
+      next.addEventListener("click", () => scrollByPage(1));
+
+      let queued = false;
+      track.addEventListener(
+        "scroll",
+        () => {
+          if (queued) return;
+          queued = true;
+          requestAnimationFrame(() => {
+            queued = false;
+            sync();
+          });
+        },
+        { passive: true },
+      );
+
+      window.addEventListener("resize", sync);
+      sync();
+    });
+
+    // Proof lightbox --------------------------------------------------------
+    const proofModal = document.querySelector("[data-proof-modal]");
+    if (proofModal instanceof HTMLDialogElement) {
+      const image = proofModal.querySelector("[data-proof-image]");
+      const fill = (selector: string, value: string) => {
+        const node = proofModal.querySelector(selector);
+        if (node) node.textContent = value;
+      };
+
+      document.querySelectorAll("[data-proof]").forEach((trigger) => {
+        trigger.addEventListener("click", () => {
+          const src = trigger.getAttribute("data-proof-src") || "";
+          const company = trigger.getAttribute("data-proof-company") || "";
+          const platform = trigger.getAttribute("data-proof-platform") || "";
+          const query = trigger.getAttribute("data-proof-query") || "";
+          const verified = trigger.getAttribute("data-proof-verified") || "";
+          const caveat = trigger.getAttribute("data-proof-caveat") || "";
+
+          if (image instanceof HTMLImageElement) {
+            image.src = src;
+            image.alt = `${platform} answering “${query}” and naming ${company}. Captured ${verified}.`;
+          }
+          fill("[data-proof-title]", company);
+          fill("[data-proof-query]", query);
+          fill("[data-proof-platform]", platform);
+          fill("[data-proof-verified]", verified);
+
+          // Per-capture caveat sits above the standing point-in-time note, and
+          // is hidden entirely for the results that reproduce reliably.
+          const caveatNode = proofModal.querySelector("[data-proof-caveat]");
+          if (caveatNode instanceof HTMLElement) {
+            caveatNode.textContent = caveat;
+            caveatNode.hidden = !caveat;
+          }
+
+          proofModal.showModal();
+        });
+      });
+
+      proofModal.querySelectorAll("[data-close-proof]").forEach((button) => {
+        button.addEventListener("click", () => proofModal.close());
+      });
+
+      // A click landing outside the dialog's own box is a backdrop click.
+      proofModal.addEventListener("click", (event) => {
+        const rect = proofModal.getBoundingClientRect();
+        const inside =
+          event.clientX >= rect.left &&
+          event.clientX <= rect.right &&
+          event.clientY >= rect.top &&
+          event.clientY <= rect.bottom;
+        if (!inside) proofModal.close();
+      });
+    }
+
+    // Sticky nav ------------------------------------------------------------
+    const header = document.querySelector("[data-header]");
+    const navToggle = document.querySelector("[data-nav-toggle]");
+    const navPanel = document.querySelector("[data-nav-panel]");
+    const navToggleLabel = document.querySelector("[data-nav-toggle-label]");
+
+    if (header && navToggle instanceof HTMLButtonElement && navPanel) {
+      const setMenu = (open: boolean) => {
+        header.classList.toggle("nav-open", open);
+        navToggle.setAttribute("aria-expanded", String(open));
+        if (navToggleLabel) navToggleLabel.textContent = open ? "Close menu" : "Open menu";
+      };
+
+      navToggle.addEventListener("click", () => setMenu(navToggle.getAttribute("aria-expanded") !== "true"));
+
+      navPanel.addEventListener("click", (event) => {
+        if (event.target instanceof Element && event.target.closest("a")) setMenu(false);
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape" || navToggle.getAttribute("aria-expanded") !== "true") return;
+        setMenu(false);
+        navToggle.focus();
+      });
+
+      document.addEventListener("pointerdown", (event) => {
+        if (event.target instanceof Element && !event.target.closest(".site-header")) setMenu(false);
+      });
+
+      const wide = window.matchMedia("(min-width: 1081px)");
+      wide.addEventListener("change", (event) => {
+        if (event.matches) setMenu(false);
+      });
+    }
+
+    // The header starts flush with the page and gains its rule on scroll.
+    if (header) {
+      let headerQueued = false;
+      const markScrolled = () => {
+        headerQueued = false;
+        header.classList.toggle("scrolled", window.scrollY > 8);
+      };
+      window.addEventListener(
+        "scroll",
+        () => {
+          if (headerQueued) return;
+          headerQueued = true;
+          requestAnimationFrame(markScrolled);
+        },
+        { passive: true },
+      );
+      markScrolled();
+    }
+
+    // Scroll spy. Marks the link for the section currently under the header —
+    // read from positions on scroll, so it survives anchor jumps.
+    const spyLinks = Array.from(
+      document.querySelectorAll<HTMLAnchorElement>('.site-nav a[href^="#"], .nav-panel a[href^="#"]'),
+    );
+    const spyTargets = spyLinks
+      .map((link) => document.querySelector(link.hash))
+      .filter((node, index, all): node is Element => Boolean(node) && all.indexOf(node) === index);
+
+    if (spyTargets.length) {
+      let spyQueued = false;
+
+      const markCurrent = () => {
+        spyQueued = false;
+        const line = (document.querySelector(".site-header")?.getBoundingClientRect().height || 0) + 24;
+        const atEnd = window.innerHeight + window.scrollY >= document.body.offsetHeight - 2;
+        let active: Element | null = atEnd ? spyTargets[spyTargets.length - 1] : null;
+        if (!active) {
+          for (const target of spyTargets) {
+            if (target.getBoundingClientRect().top <= line) active = target;
+          }
+        }
+        spyLinks.forEach((link) => {
+          const on = Boolean(active) && link.hash === `#${active!.id}`;
+          if (on) link.setAttribute("aria-current", "true");
+          else link.removeAttribute("aria-current");
+        });
+      };
+
+      window.addEventListener(
+        "scroll",
+        () => {
+          if (spyQueued) return;
+          spyQueued = true;
+          requestAnimationFrame(markCurrent);
+        },
+        { passive: true },
+      );
+      markCurrent();
+    }
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    // Scroll reveals: fade + 12px rise, once, never re-triggering.
+    const reveals = document.querySelectorAll("[data-reveal]");
+    if (reducedMotion.matches) {
+      reveals.forEach((node) => node.classList.add("revealed"));
+    } else {
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("revealed");
+            revealObserver.unobserve(entry.target);
+          });
+        },
+        { rootMargin: "0px 0px -8% 0px", threshold: 0.08 },
+      );
+      reveals.forEach((node) => revealObserver.observe(node));
+    }
+
+    // Custom pointer: a Signal Red dot at the exact position, with an ink ring
+    // easing in behind it. Fine pointers only; text fields keep the native
+    // caret so typing is never guessed at.
+    const dot = document.querySelector("[data-cursor-dot]");
+    const ring = document.querySelector("[data-cursor-ring]");
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+    if (dot instanceof HTMLElement && ring instanceof HTMLElement && finePointer.matches && !reducedMotion.matches) {
+      const root = document.documentElement;
+      const pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+      const trail = { x: pointer.x, y: pointer.y };
+      let frame = 0;
+
+      const place = (node: HTMLElement, x: number, y: number) => {
+        node.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+      };
+
+      const render = () => {
+        trail.x += (pointer.x - trail.x) * 0.2;
+        trail.y += (pointer.y - trail.y) * 0.2;
+        place(ring, trail.x, trail.y);
+        place(dot, pointer.x, pointer.y);
+        frame = requestAnimationFrame(render);
+      };
+
+      const start = () => {
+        if (!frame) frame = requestAnimationFrame(render);
+      };
+
+      const stop = () => {
+        cancelAnimationFrame(frame);
+        frame = 0;
+      };
+
+      document.addEventListener(
+        "pointermove",
+        (event) => {
+          if (event.pointerType !== "mouse") return;
+          pointer.x = event.clientX;
+          pointer.y = event.clientY;
+          root.classList.add("cursor-on");
+          const target = event.target;
+          if (target instanceof Element) {
+            root.classList.toggle("cursor-hot", Boolean(target.closest("a, button, summary, select, label")));
+            root.classList.toggle("cursor-text", Boolean(target.closest("input:not([type=hidden]), textarea")));
+          }
+          start();
+        },
+        { passive: true },
+      );
+
+      document.addEventListener("mouseleave", () => {
+        root.classList.remove("cursor-on");
+        stop();
+      });
+
+      document.addEventListener("mouseenter", start);
+      document.addEventListener("pointerdown", () => root.classList.add("cursor-press"));
+      document.addEventListener("pointerup", () => root.classList.remove("cursor-press"));
+      window.addEventListener("blur", () => root.classList.remove("cursor-on", "cursor-press"));
+    }
+
+    // The grid reacts under the pointer. Desktop only, in both markup and
+    // behaviour — mobile never attaches the listener.
+    const canvas = document.querySelector("[data-pixels]");
+    const ctx = canvas instanceof HTMLCanvasElement ? canvas.getContext("2d") : null;
+    const isMobile = window.matchMedia("(max-width: 720px)").matches;
+
+    if (canvas instanceof HTMLCanvasElement && ctx && !reducedMotion.matches && !isMobile) {
+      const CELL = 26;
+      const DECAY = 0.03;
+      const cells = new Map<number, number>();
+      let cols = 0;
+      let rows = 0;
+      let pixelFrame = 0;
+
+      const size = () => {
+        const ratio = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.ceil(window.innerWidth * ratio);
+        canvas.height = Math.ceil(window.innerHeight * ratio);
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        cols = Math.ceil(window.innerWidth / CELL);
+        rows = Math.ceil(window.innerHeight / CELL);
+        cells.clear();
+      };
+
+      const paint = () => {
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        cells.forEach((level, key) => {
+          const next = level - DECAY;
+          if (next <= 0.02) {
+            cells.delete(key);
+            return;
+          }
+          cells.set(key, next);
+          const col = key % cols;
+          const row = (key - col) / cols;
+          const x = col * CELL;
+          const y = row * CELL;
+
+          ctx.fillStyle = `rgba(17, 17, 17, ${next * 0.08})`;
+          ctx.fillRect(x, y, CELL - 1, CELL - 1);
+
+          if ((col * 31 + row * 17) % 9 === 0) {
+            const mark = Math.round(CELL * 0.3);
+            const offset = Math.round((CELL - 1 - mark) / 2);
+            ctx.fillStyle = `rgba(226, 30, 53, ${next * 0.45})`;
+            ctx.fillRect(x + offset, y + offset, mark, mark);
+          }
+        });
+        pixelFrame = cells.size ? requestAnimationFrame(paint) : 0;
+      };
+
+      const spread = [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+        [1, 1],
+        [-1, -1],
+        [1, -1],
+        [-1, 1],
+      ];
+
+      const light = (x: number, y: number, strength: number) => {
+        const col = Math.floor(x / CELL);
+        const row = Math.floor(y / CELL);
+        const patch: number[][] = [[0, 0]];
+        for (let n = 0; n < 4; n++) patch.push(spread[Math.floor(Math.random() * spread.length)]);
+
+        patch.forEach(([dx, dy], index) => {
+          const c = col + dx;
+          const r = row + dy;
+          if (c < 0 || r < 0 || c >= cols || r >= rows) return;
+          const key = r * cols + c;
+          const add = index === 0 ? strength : strength * 0.5;
+          cells.set(key, Math.min(1, (cells.get(key) || 0) + add));
+        });
+
+        if (!pixelFrame) pixelFrame = requestAnimationFrame(paint);
+      };
+
+      size();
+
+      let resizeTimer = 0;
+      window.addEventListener("resize", () => {
+        window.clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(size, 150);
+      });
+
+      document.addEventListener(
+        "pointermove",
+        (event) => {
+          if (event.pointerType !== "mouse") return;
+          light(event.clientX, event.clientY, 0.8);
+        },
+        { passive: true },
+      );
+    }
+  </script>
+
+  <style>
+    /* =====================================================================
+       Precision GEO
+
+       Reuses the system in global.css (shell, section, eyebrow, form, cursor,
+       marquee, timeline) and adds only what this page's structure needs.
+       Rules kept from the system: 1px borders not fills, 4px radius, no
+       shadows, Signal Red only on recommendation marks, result figures,
+       progress and focus.
+       ===================================================================== */
+
+    /* Background grid ---------------------------------------------------- */
+    .grid-bg {
+      position: fixed;
+      z-index: -2;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, rgba(17, 17, 17, 0.045) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(17, 17, 17, 0.045) 1px, transparent 1px);
+      background-size: 26px 26px;
+      pointer-events: none;
+    }
+
+    /* Header ------------------------------------------------------------- */
+    /* Starts flush with the page; the rule arrives with the first scroll. */
+    .site-header {
+      background: color-mix(in srgb, var(--paper) 88%, transparent);
+      backdrop-filter: blur(8px);
+      border-bottom-color: transparent;
+      transition: border-color 200ms var(--ease);
+    }
+
+    .site-header.scrolled {
+      border-bottom-color: var(--rule-light);
+    }
+
+    .header-action {
+      padding: 12px 20px;
+      border: 1px solid var(--ink);
+      border-radius: 4px;
+      background: var(--ink);
+      color: var(--surface);
+      transition: background 200ms var(--ease), border-color 200ms var(--ease);
+    }
+
+    .header-action:hover {
+      background: var(--signal-deep);
+      border-color: var(--signal-deep);
+      color: var(--surface);
+    }
+
+    .nav-panel-cta {
+      text-decoration: none;
+    }
+
+    /* Hero --------------------------------------------------------------- */
+    .hero-grid {
+      align-items: center;
+    }
+
+    .hero h1 {
+      max-width: 21ch;
+    }
+
+    .hero h1 .accent {
+      color: var(--signal);
+      font-weight: 700;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--s5);
+      margin-top: var(--s6);
+    }
+
+    .hero-cta {
+      margin-top: 0;
+    }
+
+    .hero-cta.section-cta {
+      margin-top: 30px;
+    }
+
+    .hero-cta span,
+    .header-action span,
+    .closing-cta span {
+      display: inline-block;
+      margin-left: 10px;
+      transition: transform 200ms var(--ease);
+    }
+
+    .hero-cta:hover span,
+    .header-action:hover span,
+    .closing-cta:hover span {
+      transform: translateX(3px);
+    }
+
+    .hero-link {
+      color: var(--muted);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      text-decoration: none;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 2px;
+      transition: color 180ms var(--ease), border-color 180ms var(--ease);
+    }
+
+    .hero-link:hover {
+      color: var(--ink);
+      border-color: var(--signal);
+    }
+
+    /* Marquee, dark ------------------------------------------------------ */
+    .marquee--dark {
+      margin-top: var(--s12);
+      background: var(--inverse-surface);
+      border-color: var(--inverse-rule);
+    }
+
+    .marquee--dark .marquee-row + .marquee-row {
+      border-top-color: var(--inverse-rule);
+    }
+
+    .marquee--dark .marquee-row--lead .marquee-track {
+      color: var(--inverse-on);
+      font-size: clamp(1.75rem, 4.2vw, 3.25rem);
+    }
+
+    .marquee--dark .marquee-row--sub .marquee-track {
+      color: var(--inverse-muted);
+    }
+
+    /* Square separators rather than dots: the grid's own mark. */
+    .marquee--dark .marquee-word::before {
+      border-radius: 0;
+      background: var(--signal);
+    }
+
+    /* Section surfaces --------------------------------------------------- */
+    .section--dark {
+      background: var(--inverse-surface);
+      color: var(--inverse-on);
+      border-bottom-color: var(--inverse-rule);
+    }
+
+    .section--dark h2,
+    .section--dark h3 {
+      color: var(--inverse-on);
+    }
+
+    .section--dark .eyebrow {
+      color: var(--inverse-muted);
+    }
+
+    .section--dark .eyebrow::after {
+      background: var(--inverse-rule);
+    }
+
+    .section--dark .eyebrow-idx {
+      color: var(--inverse-on);
+    }
+
+    .section--dark .lede {
+      color: var(--inverse-muted);
+    }
+
+    .section--white {
+      background: var(--surface);
+    }
+
+    .section--low {
+      background: var(--surface-low);
+    }
+
+    /* Shared split: statement left, evidence right ----------------------- */
+    .split-grid,
+    .shift-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: var(--split-gap);
+      align-items: start;
+    }
+
+    .split-grid h2,
+    .shift-grid h2 {
+      max-width: 15ch;
+    }
+
+    /* 01 — Case-study carousel ------------------------------------------- */
+    .results-cta {
+      margin-top: 30px;
+      margin-bottom: 10px;
+      background: var(--signal);
+    }
+
+    .results-cta:hover {
+      background: var(--signal-deep);
+    }
+
+    .carousel {
+      display: grid;
+      gap: var(--s4);
+      /* Without this the track can refuse to shrink to the shell and grows to
+         fit all six cards, which defeats the overflow that hides them. */
+      min-width: 0;
+    }
+
+    /* The track is the scroller: it is exactly two cards wide, and the other
+       four are clipped by the overflow and reachable only by scrolling.
+       Flex rather than grid so the card width is a plain percentage of the
+       scrollport, which resolves reliably; percentage track sizes inside
+       grid-auto-columns do not when the container width is indefinite. */
+    .carousel-track {
+      display: flex;
+      gap: var(--s5);
+      margin: 0;
+      padding: 4px;
+      min-width: 0;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      list-style: none;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+    }
+
+    .carousel-track::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* align-items defaults to stretch, so every card is the same height.
+       flex: none + an explicit width keeps exactly two in the scrollport. */
+    .case {
+      display: flex;
+      flex: none;
+      width: calc((100% - var(--s5)) / 2);
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      overflow: hidden;
+      scroll-snap-align: start;
+      cursor: pointer;
+      transition: border-color 180ms var(--ease);
+    }
+
+    .case:hover {
+      border-color: var(--outline);
+    }
+
+    /* Fixed ratio, so all six captures occupy identical height however tall the
+       source crop is. Anchored top — the model's answer starts at the top of
+       the shot, and that is the part worth showing. */
+    .case-shot {
+      position: relative;
+      flex: none;
+      margin: 0;
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+      background: var(--inverse-surface);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    /* Taken out of flow so the figure's height comes from aspect-ratio alone.
+       Left in flow, the image's own proportions win and each capture sets its
+       own height, which is what we are trying to stop. */
+    .case-shot img {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+    }
+
+    .case-body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: var(--s2);
+      padding: var(--s4);
+    }
+
+    .case-platform {
+      color: var(--data-gray);
+      font: 500 0.6875rem/1.5 var(--font-mono);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* The three variable-length fields are pinned to an exact number of lines,
+       so the record rows and the button land on the same baseline in every
+       card rather than drifting with the length of the copy. */
+    .case h3 {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      min-height: calc(2 * 1.28em);
+      overflow: hidden;
+      font-size: clamp(1.15rem, 1.6vw, 1.375rem);
+      line-height: 1.28;
+    }
+
+    .case-industry {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+      overflow: hidden;
+      color: var(--data-gray);
+      font: 500 0.75rem/1.4 var(--font-mono);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .case-result {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      min-height: calc(3 * 1.45em);
+      overflow: hidden;
+      color: var(--ink);
+      font-size: 1.0625rem;
+      font-weight: 700;
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+    }
+
+    .case .record dd {
+      line-height: 1.5;
+    }
+
+    /* Only the query runs long enough to wrap; Verified and Result type are
+       one line in every card already, so pinning those too just adds dead space. */
+    .case .record > div:first-child dd {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      min-height: calc(2 * 1.5em);
+      overflow: hidden;
+    }
+
+    .case-caveat {
+      color: var(--muted);
+      font-size: 0.8125rem;
+      line-height: 1.55;
+    }
+
+    /* Arrows: white disc, Signal Red on hover. They sit above the track, pulled
+       to the right edge so they read as a control for the cards below without
+       competing with the left-aligned section copy. The 4px inset matches the
+       track's own padding, so the right arrow lines up with the card edge. */
+    .carousel-controls {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--s2);
+      padding-right: 4px;
+    }
+
+    .carousel-arrow {
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 50%;
+      color: var(--ink);
+      cursor: pointer;
+      transition:
+        background 180ms var(--ease),
+        border-color 180ms var(--ease),
+        color 180ms var(--ease),
+        opacity 180ms var(--ease);
+    }
+
+    .carousel-arrow svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .carousel-arrow:hover:not(:disabled) {
+      background: var(--signal);
+      border-color: var(--signal);
+      color: var(--surface);
+    }
+
+    .carousel-arrow:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    /* 02 / 05 — Dark evidence cards -------------------------------------- */
+    .problem-stack,
+    .benefit-grid {
+      display: grid;
+      gap: var(--s3);
+    }
+
+    .benefit-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-top: var(--s8);
+    }
+
+    .dark-card {
+      padding: var(--s5);
+      background: var(--inverse-surface);
+      border: 1px solid var(--inverse-rule);
+      border-radius: 4px;
+      color: var(--inverse-muted);
+      transition: border-color 200ms var(--ease);
+    }
+
+    .dark-card:hover {
+      border-color: var(--signal);
+    }
+
+    .dark-card-idx {
+      margin-bottom: var(--s4);
+      padding-bottom: var(--s3);
+      border-bottom: 1px solid var(--inverse-rule);
+      color: var(--signal);
+      font: 500 0.75rem/1.3 var(--font-mono);
+      letter-spacing: 0.08em;
+    }
+
+    .dark-card h3 {
+      margin-bottom: 10px;
+      color: var(--inverse-on);
+      font-size: 1.1875rem;
+    }
+
+    .dark-card p:last-child {
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* 03 — Solution columns. Subgrid keeps the step number, heading and copy
+       on the same three lines across all four columns. */
+    .solution-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-rows: auto auto auto;
+      column-gap: var(--s5);
+    }
+
+    .solution {
+      display: grid;
+      grid-row: span 3;
+      grid-template-rows: subgrid;
+      gap: var(--s2);
+      transition: border-top-color 200ms var(--ease);
+    }
+
+    .solution:hover {
+      border-top-color: var(--signal);
+    }
+
+    .step-no {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--data-gray);
+      font: 500 0.75rem/1.3 var(--font-mono);
+      letter-spacing: 0.08em;
+    }
+
+    /* The small Signal Red indicator each column carries. */
+    .step-no::after {
+      content: "";
+      width: 5px;
+      height: 5px;
+      background: var(--signal);
+    }
+
+    .solution h3 {
+      font-size: 1.125rem;
+      letter-spacing: -0.01em;
+      text-transform: none;
+    }
+
+    .solution p {
+      color: var(--muted);
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* Shared record + proof control (case cards) --------------------------- */
+    .record {
+      margin: 0;
+    }
+
+    .record > div {
+      display: grid;
+      grid-template-columns: 104px minmax(0, 1fr);
+      gap: var(--s2);
+      align-items: baseline;
+      padding-block: 12px;
+      border-top: 1px solid var(--rule-light);
+    }
+
+    .record dt {
+      color: var(--data-gray);
+      font: 500 0.6875rem/1.7 var(--font-mono);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .record dd {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9375rem;
+    }
+
+    .proof-action {
+      align-self: start;
+      margin-top: auto;
+      padding: 10px 0 4px;
+      background: none;
+      border: 0;
+      border-bottom: 2px solid var(--ink);
+      color: var(--ink);
+      font-size: 0.9375rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: color 180ms var(--ease), border-color 180ms var(--ease);
+    }
+
+    .proof-action:hover {
+      color: var(--signal);
+      border-color: var(--signal);
+    }
+
+    .proof-action span {
+      display: inline-block;
+      margin-left: 8px;
+      transition: transform 180ms var(--ease);
+    }
+
+    .proof-action:hover span {
+      transform: translateX(3px);
+    }
+
+    .how-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 8fr) minmax(240px, 3fr);
+      gap: var(--split-gap);
+      align-items: start;
+    }
+
+    .stage-timeline {
+      margin-top: 0;
+    }
+
+    .stage-timeline ol::before {
+      background: var(--rule);
+    }
+
+    /* The progress line is the one place Signal Red runs long. */
+    .stage-timeline ol::after {
+      content: "";
+      position: absolute;
+      inset: 0 auto auto 0;
+      width: 100%;
+      height: 2px;
+      background: var(--signal);
+      transform-origin: 0 50%;
+    }
+
+    .stage-timeline .node {
+      background: var(--ink);
+    }
+
+    .stage-timeline h3 {
+      margin: 4px 0 6px;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .stage-timeline .week {
+      color: var(--signal);
+    }
+
+    .how-aside {
+      padding: var(--s5);
+      background: var(--inverse-surface);
+      border: 1px solid var(--inverse-rule);
+      border-radius: 4px;
+      color: var(--inverse-muted);
+    }
+
+    .how-aside-label {
+      color: var(--inverse-muted);
+      font: 500 0.6875rem/1.5 var(--font-mono);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .how-aside-figure {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin: var(--s2) 0 var(--s3);
+      padding-bottom: var(--s3);
+      border-bottom: 1px solid var(--inverse-rule);
+      color: var(--signal);
+      font: 500 clamp(3rem, 6vw, 4.5rem)/1 var(--font-mono);
+      letter-spacing: -0.04em;
+    }
+
+    .how-aside-figure span {
+      color: var(--inverse-on);
+      font-size: 0.875rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .how-aside-note {
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+
+    /* 07 — Industry grid. Alternating fills give the block its rhythm. */
+    .industry-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+      margin: 0;
+      padding: 0;
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      list-style: none;
+      overflow: hidden;
+    }
+
+    .industry {
+      display: grid;
+      gap: var(--s5);
+      align-content: space-between;
+      min-height: 168px;
+      padding: var(--s4);
+      background: var(--surface);
+      border-right: 1px solid var(--rule-light);
+      border-bottom: 1px solid var(--rule-light);
+      color: var(--ink);
+      transition: background 200ms var(--ease), color 200ms var(--ease);
+    }
+
+    .industry:nth-child(4n) {
+      border-right: 0;
+    }
+
+    .industry:nth-child(n + 5) {
+      border-bottom: 0;
+    }
+
+    .industry:nth-child(3),
+    .industry:nth-child(6),
+    .industry:nth-child(8) {
+      background: var(--inverse-surface);
+      color: var(--inverse-on);
+    }
+
+    .industry-no {
+      color: var(--data-gray);
+      font: 500 0.6875rem/1.4 var(--font-mono);
+      letter-spacing: 0.08em;
+    }
+
+    .industry:nth-child(3) .industry-no,
+    .industry:nth-child(6) .industry-no,
+    .industry:nth-child(8) .industry-no {
+      color: var(--signal);
+    }
+
+    .industry-name {
+      color: inherit;
+      font-family: var(--font-display);
+      font-size: 1.0625rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    /* 08 — Lead section --------------------------------------------------- */
+    .lead-section {
+      padding-block: var(--section-space);
+      background: var(--inverse-surface);
+      color: var(--inverse-on);
+      border-bottom: 1px solid var(--inverse-rule);
+    }
+
+    .lead-section h2 {
+      max-width: 16ch;
+      color: var(--inverse-on);
+    }
+
+    .lead-section .eyebrow {
+      color: var(--inverse-muted);
+    }
+
+    .lead-section .eyebrow::after {
+      background: var(--inverse-rule);
+    }
+
+    .lead-section .eyebrow-idx {
+      color: var(--inverse-on);
+    }
+
+    .lead-section .lede {
+      max-width: 48ch;
+      margin-top: var(--s3);
+      color: var(--inverse-muted);
+      font-size: 1.0625rem;
+    }
+
+    .lead-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 6fr) minmax(360px, 5fr);
+      gap: var(--split-gap);
+      align-items: start;
+    }
+
+    .lead-benefits {
+      display: grid;
+      gap: 10px;
+      margin: var(--s6) 0 0;
+      padding: var(--s5) 0 0;
+      border-top: 1px solid var(--inverse-rule);
+      list-style: none;
+    }
+
+    .lead-benefits li {
+      position: relative;
+      padding-left: 20px;
+      color: var(--inverse-on);
+      font-size: 0.9375rem;
+    }
+
+    .lead-benefits li::before {
+      content: "";
+      position: absolute;
+      top: 0.55em;
+      left: 0;
+      width: 6px;
+      height: 6px;
+      background: var(--signal);
+    }
+
+    .lead-process {
+      margin-top: var(--s6);
+      color: var(--inverse-muted);
+      font: 500 0.75rem/1.4 var(--font-mono);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* The form container stays white inside the dark section. */
+    .lead-section .panel {
+      border-color: var(--rule);
+    }
+
+    /* Signal Red detail on the primary action's hover, never as its fill. */
+    .lead-section .submit-button:hover {
+      background: var(--ink);
+      box-shadow: inset 0 -3px 0 0 var(--signal);
+    }
+
+    /* Final CTA ----------------------------------------------------------- */
+    .closing {
+      position: relative;
+      padding-block: clamp(96px, 10vw, 144px);
+      background: var(--inverse-surface);
+      color: var(--inverse-on);
+      overflow: hidden;
+      text-align: center;
+    }
+
+    /* The technical grid, made visible for one section, with a deterministic
+       scatter of Signal Red cells. */
+    .closing-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 26px 26px;
+      pointer-events: none;
+    }
+
+    .closing-grid i {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: var(--signal);
+      opacity: 0.55;
+    }
+
+    .closing .shell {
+      position: relative;
+    }
+
+    .closing h2 {
+      max-width: 20ch;
+      margin-inline: auto;
+      color: var(--inverse-on);
+      font-size: clamp(2rem, 4.4vw, 3.25rem);
+    }
+
+    .closing-sub {
+      max-width: 46ch;
+      margin: var(--s4) auto 0;
+      color: var(--inverse-muted);
+      font-size: 1.125rem;
+    }
+
+    .hl--closing {
+      color: var(--inverse-on);
+      font-weight: 700;
+    }
+
+    .closing-cta {
+      display: inline-flex;
+      align-items: center;
+      min-height: 56px;
+      margin-top: var(--s8);
+      padding: 0 var(--s5);
+      background: var(--surface);
+      border-radius: 4px;
+      color: var(--ink);
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: box-shadow 200ms var(--ease), transform 120ms var(--ease);
+    }
+
+    .closing-cta:hover {
+      box-shadow: inset 0 -3px 0 0 var(--signal);
+    }
+
+    .closing-cta:active {
+      transform: translateY(1px);
+    }
+
+    .closing-note {
+      margin-top: var(--s5);
+      color: var(--inverse-muted);
+      font: 500 0.75rem/1.6 var(--font-mono);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* Footer --------------------------------------------------------------- */
+    .site-footer--dark {
+      padding-block: var(--s10) var(--s8);
+      background: var(--ink-body);
+      color: var(--inverse-muted);
+    }
+
+    .site-footer--dark .shell {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--s8) var(--s5);
+      align-items: start;
+      color: inherit;
+    }
+
+    /* The system's footer right-aligns its last paragraph. This footer is a
+       four-block grid, so every column reads from the same left edge. */
+    .site-footer--dark p {
+      text-align: left;
+    }
+
+    .footer-line {
+      margin-top: var(--s3);
+      color: var(--inverse-muted);
+      font: 500 0.75rem/1.4 var(--font-mono);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* The only lockup is drawn in ink. On the dark footer it is knocked out to
+       white rather than sitting invisible against the surface. */
+    .site-footer--dark .brand img {
+      height: 24px;
+      filter: brightness(0) invert(1);
+    }
+
+    .footer-nav ul,
+    .footer-contact {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .footer-nav a,
+    .footer-contact a {
+      color: var(--inverse-on);
+      font-size: 0.875rem;
+      text-decoration: none;
+      transition: color 180ms var(--ease);
+    }
+
+    .footer-nav a:hover,
+    .footer-contact a:hover,
+    .footer-legal a:hover {
+      color: var(--signal);
+    }
+
+    .footer-contact p {
+      font-size: 0.875rem;
+    }
+
+    .footer-legal {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s3) var(--s5);
+      align-items: baseline;
+      justify-content: space-between;
+      padding-top: var(--s5);
+      border-top: 1px solid var(--inverse-rule);
+      font-size: 0.8125rem;
+    }
+
+    .footer-legal a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+    }
+
+    .footer-stamp {
+      color: var(--inverse-muted);
+      font: 500 0.6875rem/1.5 var(--font-mono);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* Proof lightbox -------------------------------------------------------- */
+    .proof-modal {
+      width: min(94vw, 1000px);
+      max-height: min(90vh, 900px);
+      margin: auto;
+      padding: var(--s5);
+      overflow-y: auto;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      color: var(--ink-body);
+    }
+
+    .proof-modal::backdrop {
+      background: rgba(17, 17, 17, 0.86);
+    }
+
+    .proof-modal h2 {
+      margin: 0 var(--s6) var(--s4) 0;
+      font-size: clamp(1.25rem, 2vw, 1.5rem);
+    }
+
+    .proof-modal img {
+      width: 100%;
+      height: auto;
+      margin-bottom: var(--s4);
+      background: var(--inverse-surface);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+    }
+
+    /* A capture that moves between runs says so, in the accent reserved for
+       result marks — the claim and its limit arrive together. */
+    .proof-modal-caveat {
+      margin-top: var(--s4);
+      padding-left: var(--s3);
+      border-left: 2px solid var(--signal);
+      color: var(--ink);
+      font-size: 0.875rem;
+      font-weight: 600;
+      line-height: 1.55;
+    }
+
+    .proof-modal-caveat[hidden] {
+      display: none;
+    }
+
+    .proof-modal-note {
+      margin-top: var(--s4);
+      color: var(--muted);
+      font-size: 0.8125rem;
+      line-height: 1.6;
+    }
+
+    .proof-modal-close {
+      position: absolute;
+      top: var(--s3);
+      right: var(--s3);
+      display: grid;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      color: var(--ink);
+      cursor: pointer;
+      transition: border-color 180ms var(--ease);
+    }
+
+    .proof-modal-close:hover {
+      border-color: var(--ink);
+    }
+
+    /* Motion ---------------------------------------------------------------- */
+    /* Everything below is armed by the `js` class and runs once. Nothing over
+       300ms except the two draws, which are load/reveal moments, not UI. */
+
+    /* Each section's measuring rule extends as the section arrives. */
+    :global(html.js) [data-reveal] .eyebrow::after {
+      transform: scaleX(0);
+      transform-origin: 0 50%;
+      transition: transform 500ms var(--ease) 120ms;
+    }
+
+    :global(html.js) [data-reveal].revealed .eyebrow::after {
+      transform: scaleX(1);
+    }
+
+    /* The timeline's progress line draws along its length, then the nodes land. */
+    :global(html.js) .stage-timeline ol::after {
+      transform: scaleX(0);
+      transition: transform 560ms var(--ease) 140ms;
+    }
+
+    :global(html.js) .stage-timeline.revealed ol::after {
+      transform: scaleX(1);
+    }
+
+    :global(html.js) .stage-timeline .node {
+      opacity: 0;
+      transform: scale(0.4);
+      transition:
+        opacity 200ms var(--ease) calc(300ms + var(--i, 0) * 90ms),
+        transform 200ms var(--ease) calc(300ms + var(--i, 0) * 90ms);
+    }
+
+    :global(html.js) .stage-timeline.revealed .node {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* Responsive ------------------------------------------------------------ */
+    @media (max-width: 1080px) {
+      .split-grid,
+      .shift-grid,
+      .lead-grid,
+      .how-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .solution-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: none;
+        row-gap: var(--s8);
+      }
+
+      .carousel-track {
+        gap: var(--s3);
+      }
+
+      .case {
+        width: calc((100% - var(--s3)) / 2);
+      }
+
+      .solution {
+        display: block;
+      }
+
+      .solution > * + * {
+        margin-top: var(--s2);
+      }
+
+      .industry-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .industry:nth-child(even) {
+        border-right: 0;
+      }
+
+      .industry:nth-child(n + 5) {
+        border-bottom: 1px solid var(--rule-light);
+      }
+
+      .industry:nth-child(n + 7) {
+        border-bottom: 0;
+      }
+
+      .site-footer--dark .shell {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .hero h1 {
+        max-width: none;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+        align-items: center;
+        gap: var(--s3);
+      }
+
+      .hero-cta {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .hero-link {
+        text-align: center;
+      }
+
+      /* One card at a time, and the track bleeds to the screen edges so a
+         part-scrolled card reads as "there is more to the right". */
+      .carousel-track {
+        gap: var(--s3);
+        margin-inline: calc(var(--gutter) * -1);
+        padding-inline: var(--gutter);
+      }
+
+      .case {
+        width: 86%;
+      }
+
+      .case-body {
+        padding: var(--s3);
+      }
+
+      .marquee--dark {
+        margin-top: var(--s6);
+      }
+
+      .benefit-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .solution-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      /* The five stages become a vertical line, same red progress rule. */
+      .stage-timeline ol {
+        padding-left: var(--s4);
+      }
+
+      .stage-timeline ol::after {
+        inset: 5px auto 5px 3px;
+        width: 2px;
+        height: auto;
+      }
+
+      :global(html.js) .stage-timeline ol::after {
+        transform: scaleY(0);
+        transform-origin: 50% 0;
+      }
+
+      :global(html.js) .stage-timeline.revealed ol::after {
+        transform: scaleY(1);
+      }
+
+      .stage-timeline .node {
+        left: calc(var(--s4) * -1 - 0.5px);
+      }
+
+      .industry-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .industry {
+        min-height: 0;
+        gap: var(--s3);
+        border-right: 0;
+        border-bottom: 1px solid var(--rule-light);
+      }
+
+      .industry:last-child {
+        border-bottom: 0;
+      }
+
+      .site-footer--dark .shell {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .footer-legal {
+        justify-content: flex-start;
+      }
+
+      .grid-bg {
+        background-size: 22px 22px;
+      }
+
+      .closing-grid {
+        background-size: 22px 22px;
+      }
+
+      .pixels {
+        display: none !important;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .grid-bg,
+      .closing-grid {
+        opacity: 0.6;
+      }
+    }
+  </style>
+</BaseLayout>

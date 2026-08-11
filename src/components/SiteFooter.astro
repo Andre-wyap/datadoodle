@@ -1,0 +1,16 @@
+---
+import { Image } from "astro:assets";
+import logoLockup from "../assets/logo-lockup.png";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="shell">
+    <a class="brand" href="/" aria-label="DataDoodles home">
+      <Image src={logoLockup} alt="DataDoodles" width={278} height={52} loading="lazy" />
+    </a>
+    <p>GEO / AI Search Visibility — Klang Valley, Malaysia &amp; Singapore</p>
+    <p>© {year} DataDoodles</p>
+  </div>
+</footer>

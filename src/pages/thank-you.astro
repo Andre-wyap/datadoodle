@@ -1,0 +1,128 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import PixelField from "../components/PixelField.astro";
+
+const whatsappNumber = import.meta.env.PUBLIC_WHATSAPP_NUMBER;
+const whatsappUrl = whatsappNumber
+  ? `https://wa.me/${whatsappNumber.replace(/\D/g, "")}?text=Hi%20DataDoodles%2C%20I%20just%20submitted%20the%20form.`
+  : null;
+---
+
+<BaseLayout
+  title="Request received — DataDoodles"
+  description="Your details are in. We'll come back to you on WhatsApp within 24 hours."
+>
+  <!-- A conversion endpoint, not a landing page. Kept out of the index, and out
+       of sitemap.xml, which is an explicit allowlist. -->
+  <meta slot="head" name="robots" content="noindex, nofollow" />
+
+  <SiteHeader />
+
+  <main>
+    <section class="section thanks-section" aria-labelledby="thanks-title">
+      <PixelField />
+      <div class="shell">
+        <p class="eyebrow"><span>Request received</span></p>
+        <h1 id="thanks-title">Got it. We'll be in touch within 24 hours.</h1>
+        <p class="hero-sub">
+          Your details are with us. No cold call is coming — we'll reply on WhatsApp.
+        </p>
+
+        <ol class="next-steps">
+          <li>
+            <span class="step-label">Next</span>
+            <p>
+              We look at your site the way a search engine and an AI model do, and find where you're
+              currently getting missed.
+            </p>
+          </li>
+          <li>
+            <span class="step-label">Within 24 hours</span>
+            <p>
+              You get a straight answer on WhatsApp: what's costing you leads, and what it costs to fix.
+            </p>
+          </li>
+          <li>
+            <span class="step-label">If it's a fit</span>
+            <p>
+              We book the 90-minute kickoff and you're live in 30 days. If it isn't a fit, we'll tell you
+              that instead.
+            </p>
+          </li>
+        </ol>
+
+        <div class="thanks-actions">
+          {whatsappUrl && <a class="hero-cta" href={whatsappUrl}>Message us on WhatsApp</a>}
+          <a class="thanks-secondary" href="/case-study">See what happened after</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  .thanks-section {
+    padding-block: clamp(56px, 7vw, 96px);
+  }
+
+  .thanks-section h1 {
+    max-width: 20ch;
+  }
+
+  .thanks-section .hero-sub {
+    max-width: 52ch;
+  }
+
+  .next-steps {
+    display: grid;
+    gap: var(--s4);
+    max-width: 56ch;
+    margin: var(--s6) 0 0;
+    padding: var(--s5) 0 0;
+    border-top: 1px solid var(--rule-light);
+    list-style: none;
+  }
+
+  .step-label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--data-gray);
+    font: 500 0.6875rem/1.3 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .next-steps p {
+    margin: 0;
+    color: var(--ink-body);
+    font-size: 1.0625rem;
+  }
+
+  .thanks-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s3);
+    margin-top: var(--s6);
+  }
+
+  /* .hero-cta carries its own top margin for use directly under hero copy;
+     here the flex row owns the spacing. */
+  .thanks-actions :global(.hero-cta) {
+    margin-top: 0;
+  }
+
+  .thanks-secondary {
+    color: var(--muted);
+    font-size: 0.9375rem;
+    text-underline-offset: 3px;
+  }
+
+  .thanks-secondary:hover {
+    color: var(--signal-deep);
+  }
+</style>

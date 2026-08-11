@@ -57,7 +57,7 @@ curl -sL 'https://leadgenjay.com/api/skills/install.sh?items=taste' | bash
 
 **Audience.** Malaysian business owners, 30–55, running RM500k–RM10m revenue businesses. Clinics, law firms, professional services, education, specialist trades. They already have customers and reviews. They are reading this on a phone, on mobile data, between two other things.
 
-**The page's single job.** Get a four-field form submission for a free Findability Score.
+**The page's single job.** Get a four-field form submission for a quote. "Get your quote" is the one and only CTA — every button and link on the page leads here, worded identically everywhere.
 
 **Why this page must be excellent.** The site sells web design. It is the product demo. If it doesn't visibly outclass what the visitor currently has, the offer collapses on contact.
 
@@ -395,9 +395,9 @@ Yes — multilingual structure is part of the topic map where it makes commercia
 ### 8.10 — Final CTA
 
 **H2**
-> Find out how findable you actually are.
+> Find out what it takes to get you found.
 
-We'll show you where you appear in Google and AI search, who's appearing instead of you, and the three fixes that matter most.
+Tell us about your business and we'll come back with a straight quote — where you stand in Google and AI search today, and what it costs to fix it.
 
 Repeat the identical form component.
 
@@ -427,18 +427,19 @@ A dropdown gives clean segmentation for follow-up and removes a thinking step fo
 - Inputs 52px tall, 17px text — large enough to type on a phone without triggering iOS zoom
 - Focus: border thickens to 2px and shifts to `--signal`. This is the third and last legitimate use of the accent.
 - Button: full width, `--ink` fill, white text, 56px, 4px radius
-  **Label:** `Get my Findability Score →`
+  **Label:** `Get your quote →`
 - Micro-copy under button, 13px `--muted`:
-  *We'll send your score on WhatsApp. No cold calls.*
+  *We'll get back to you on WhatsApp. No cold calls.*
 
 That last line is not optional. The mobile number is the highest-friction field on the page; name the fear before they feel it.
 
 ### Behaviour
 
-- `POST` to `/api/lead` → forward to n8n webhook → Supabase `leads` table
+- `POST` **straight from the browser** to the n8n webhook → Supabase `leads` table. There is no server route in between, so the webhook URL ships in the page bundle and is public by design; n8n echoes any `Origin`, so CORS passes from localhost and production alike.
 - Payload includes `source` (`hero` | `footer`), `utm_*`, `referrer`, `timestamp`
-- Optimistic UI: button enters loading state immediately, resolves to a success state in place — **do not navigate away and do not open a modal**
-- Success message: *Got it. Your Findability Score is on the way — check WhatsApp within 24 hours.*
+- Button enters loading state immediately, then **redirects to `/thank-you`** on success. No modal. `/thank-you` is `noindex` and stays out of `sitemap.xml`.
+- The thank-you page leads with: *Got it. We'll be in touch within 24 hours.*
+- With no server route behind the form, the client-side checks are the only validation — they cannot be relaxed.
 - Errors are specific and actionable, never vague, and never apologise. "Enter a valid Malaysian mobile number" — not "Oops, something went wrong."
 - Honeypot field for spam. No CAPTCHA.
 

@@ -10,7 +10,7 @@ Established Malaysian SME owners aged 30–55, typically operating RM500k–RM10
 
 ## Product Purpose
 
-DataDoodles rebuilds Malaysian SME websites so customers can find, trust, and contact the business through Google and AI-assisted search. The landing page’s single conversion goal is a four-field submission for a free Findability Score. Success means the site itself demonstrates the clarity, structure, speed, accessibility, and conversion discipline being sold.
+DataDoodles rebuilds Malaysian SME websites so customers can find, trust, and contact the business through Google and AI-assisted search. The landing page's single conversion goal is a four-field submission for a quote — "Get your quote" is the one and only CTA, worded identically everywhere on the page. Success means the site itself demonstrates the clarity, structure, speed, accessibility, and conversion discipline being sold.
 
 ## Brand Personality
 

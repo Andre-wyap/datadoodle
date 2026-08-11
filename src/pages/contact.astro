@@ -1,0 +1,111 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import LeadForm from "../components/LeadForm.astro";
+import PixelField from "../components/PixelField.astro";
+
+const whatsappNumber = import.meta.env.PUBLIC_WHATSAPP_NUMBER;
+const whatsappUrl = whatsappNumber
+  ? `https://wa.me/${whatsappNumber.replace(/\D/g, "")}?text=Hi%20DataDoodles%2C%20I%27d%20like%20to%20work%20with%20you.`
+  : "#contact-form";
+---
+
+<BaseLayout
+  title="Contact — DataDoodles"
+  description="Get in touch with DataDoodles for a quote, or reach us directly on WhatsApp or email."
+>
+  <SiteHeader />
+
+  <main>
+    <section class="section contact-section" aria-labelledby="contact-title">
+      <PixelField />
+      <div class="shell">
+        <div class="hero-grid">
+          <div>
+            <p class="eyebrow"><span>Contact us</span></p>
+            <h1 id="contact-title">Let's talk about what it'll take to get you found.</h1>
+            <p class="hero-sub">
+              Tell us a little about your business and we'll come back with a quote on WhatsApp — what it takes to
+              get you found in Google and AI search, and what it costs.
+            </p>
+
+            <dl class="contact-details">
+              <div>
+                <dt>Email</dt>
+                <dd><a href="mailto:hello@datadoodles.my">hello@datadoodles.my</a></dd>
+              </div>
+              {
+                whatsappNumber && (
+                  <div>
+                    <dt>WhatsApp</dt>
+                    <dd><a href={whatsappUrl}>Message us directly</a></dd>
+                  </div>
+                )
+              }
+              <div>
+                <dt>Based in</dt>
+                <dd>Klang Valley, Malaysia — serving Malaysia &amp; Singapore</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="hero-exhibit" id="contact-form">
+            <div class="panel">
+              <span class="panel-label">Work With Us</span>
+              <LeadForm source="contact" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  .contact-section {
+    padding-block: clamp(56px, 7vw, 96px);
+  }
+
+  .contact-section h1 {
+    max-width: 18ch;
+  }
+
+  .contact-details {
+    display: grid;
+    gap: var(--s4);
+    max-width: 40ch;
+    margin-top: var(--s6);
+    padding-top: var(--s5);
+    border-top: 1px solid var(--rule-light);
+  }
+
+  .contact-details dt {
+    color: var(--data-gray);
+    font: 500 0.6875rem/1.3 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .contact-details dd {
+    margin: 4px 0 0;
+    color: var(--ink);
+    font-size: 1.0625rem;
+  }
+
+  .contact-details a {
+    color: var(--ink);
+  }
+
+  .contact-details a:hover {
+    color: var(--signal-deep);
+  }
+
+  @media (max-width: 1080px) {
+    .contact-section .hero-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

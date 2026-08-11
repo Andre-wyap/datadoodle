@@ -1,6 +1,6 @@
 ---
 interface Props {
-  source: "hero" | "footer";
+  source: "hero" | "footer" | "home" | "home-footer" | "contact";
 }
 
 const { source } = Astro.props;
@@ -9,9 +9,14 @@ const id = `lead-${source}`;
 
 <form class="lead-form" data-lead-form novalidate>
   <input type="hidden" name="source" value={source} />
+  <!-- Honeypot. The name is deliberately meaningless: an earlier version called
+       this "company_site" with a "Company website" label, which browser autofill
+       recognised and filled — silently flagging real people as bots. Autofill
+       ignores both aria-hidden and off-screen positioning, so the name is the
+       only defence that actually holds. -->
   <div class="honey" aria-hidden="true">
-    <label for={`${id}-company-site`}>Company website</label>
-    <input id={`${id}-company-site`} name="company_site" type="text" tabindex="-1" autocomplete="off" />
+    <label for={`${id}-dd-ref`}>Leave this field empty</label>
+    <input id={`${id}-dd-ref`} name="dd_ref" type="text" tabindex="-1" autocomplete="off" />
   </div>
 
   <div class="field">
@@ -39,10 +44,116 @@ const id = `lead-${source}`;
   </div>
 
   <button class="submit-button" type="submit">
-    <span data-button-label>Let's Work Together</span>
+    <span data-button-label>Get your quote</span>
   </button>
   <p class="form-note">
     No obligation. We will contact you to understand your business and explain the next step.
   </p>
   <div class="form-status" data-form-status role="status" aria-live="polite"></div>
 </form>
+
+<script>
+  // The form posts straight from the browser to the n8n webhook — there is no
+  // server route in between, so this URL ships in the page bundle and is public
+  // by design.
+  //
+  // This is the production path, which stays registered as long as the workflow
+  // is Active in n8n. Only swap in /webhook-test/ while stepping through the
+  // flow on the canvas, and swap it back before deploying: the test path answers
+  // one call per "Execute workflow" click and 404s after that, dropping leads.
+  const WEBHOOK_URL = "https://n8n.srv1120581.hstgr.cloud/webhook/datadoodle";
+  const THANK_YOU_PATH = "/thank-you";
+
+  const mobilePattern = /^(?:\+?60|0)1[0-46-9]\d{7,8}$/;
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const params = new URLSearchParams(window.location.search);
+
+  document.querySelectorAll("[data-lead-form]").forEach((form) => {
+    if (!(form instanceof HTMLFormElement)) return;
+    if (form.dataset.leadFormWired === "true") return;
+    form.dataset.leadFormWired = "true";
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const data = Object.fromEntries(new FormData(form));
+
+      // Honeypot. Bots fill the hidden field; send nothing, but land them on the
+      // same page a human sees so they get no signal that they were caught.
+      // Logged because this path is otherwise indistinguishable from success —
+      // it redirects without sending, which looks exactly like n8n dropping data.
+      if (String(data.dd_ref || "").trim()) {
+        console.warn("Lead form: honeypot tripped — nothing was sent to the webhook.");
+        window.location.assign(THANK_YOU_PATH);
+        return;
+      }
+
+      // With no server route behind this, these checks are the only validation
+      // standing between the visitor and the CRM record.
+      const errors: Record<string, string> = {
+        name: String(data.name || "").trim().length >= 2 ? "" : "Enter your name.",
+        company: String(data.company || "").trim().length >= 2 ? "" : "Enter your company name.",
+        email: emailPattern.test(String(data.email || "").trim()) ? "" : "Enter a valid email address.",
+        mobile: mobilePattern.test(String(data.mobile || "").replace(/[\s-]/g, ""))
+          ? ""
+          : "Enter a valid Malaysian phone number.",
+      };
+
+      form.querySelectorAll("[data-error-for]").forEach((node) => {
+        const field = node.getAttribute("data-error-for");
+        const message = field ? errors[field] : "";
+        node.textContent = message || "";
+        const input = field ? form.elements.namedItem(field) : null;
+        if (input instanceof HTMLElement) input.setAttribute("aria-invalid", message ? "true" : "false");
+      });
+
+      const firstError = Object.entries(errors).find(([, message]) => message);
+      if (firstError) {
+        const input = form.elements.namedItem(firstError[0]);
+        if (input instanceof HTMLElement) input.focus();
+        return;
+      }
+
+      const button = form.querySelector("button");
+      const label = form.querySelector("[data-button-label]");
+      const status = form.querySelector("[data-form-status]");
+      if (!(button instanceof HTMLButtonElement) || !label || !status) return;
+      button.disabled = true;
+      label.textContent = "Sending your details…";
+      status.textContent = "";
+
+      // Built key by key rather than spread, so the honeypot never reaches n8n
+      // and the values land normalised.
+      const payload = {
+        name: String(data.name || "").trim(),
+        company: String(data.company || "").trim(),
+        email: String(data.email || "").trim().toLowerCase(),
+        mobile: String(data.mobile || "").replace(/[\s-]/g, ""),
+        source: String(data.source || "hero"),
+        utm_source: params.get("utm_source") || "",
+        utm_medium: params.get("utm_medium") || "",
+        utm_campaign: params.get("utm_campaign") || "",
+        utm_term: params.get("utm_term") || "",
+        utm_content: params.get("utm_content") || "",
+        referrer: document.referrer,
+        timestamp: new Date().toISOString(),
+      };
+
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(payload),
+          signal: AbortSignal.timeout(10000),
+        });
+        console.info("Lead form: webhook responded", response.status, WEBHOOK_URL);
+        if (!response.ok) throw new Error(`Lead webhook returned ${response.status}`);
+        window.location.assign(THANK_YOU_PATH);
+      } catch (error) {
+        console.error("Lead submission failed", error);
+        status.textContent = "We couldn't send your details. Please try again, or WhatsApp us directly.";
+        button.disabled = false;
+        label.textContent = "Try again";
+      }
+    });
+  });
+</script>

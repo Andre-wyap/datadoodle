@@ -1,0 +1,130 @@
+---
+import { getCollection, render } from "astro:content";
+import BlogLayout from "../../layouts/BlogLayout.astro";
+import PixelField from "../../components/PixelField.astro";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const dateFmt = new Intl.DateTimeFormat("en-MY", { year: "numeric", month: "short", day: "numeric" });
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.date.toISOString(),
+  author: { "@type": "Organization", name: post.data.author },
+  publisher: { "@type": "Organization", name: "DataDoodles" },
+  mainEntityOfPage: canonical.toString(),
+};
+---
+
+<BlogLayout title={`${post.data.title} — DataDoodles`} description={post.data.description}>
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} slot="head" />
+
+  <article class="post section">
+    <PixelField />
+    <div class="shell post-shell">
+      <a class="post-back" href="/blog">← All articles</a>
+
+      <p class="eyebrow"><span>{post.data.category}</span></p>
+      <h1>{post.data.title}</h1>
+
+      <p class="post-meta">
+        {post.data.author} · <time datetime={post.data.date.toISOString()}>{dateFmt.format(post.data.date)}</time>
+      </p>
+
+      <div class="prose">
+        <Content />
+      </div>
+
+      <div class="post-cta">
+        <p class="post-cta-label">Get your quote</p>
+        <h2>Find out what it takes to get you found.</h2>
+        <p>Tell us about your business and we'll come back with a straight quote — where you stand in Google and AI search today, and what it costs to fix it.</p>
+        <a class="hero-cta" href="/#visibility-check">
+          Get your quote <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+  </article>
+</BlogLayout>
+
+<style>
+  .post-shell {
+    max-width: 76ch;
+  }
+
+  .post-back {
+    display: inline-block;
+    margin-bottom: var(--s6);
+    color: var(--muted);
+    font: 500 0.8125rem/1.3 var(--font-mono);
+    letter-spacing: 0.04em;
+    text-decoration: none;
+  }
+
+  .post-back:hover {
+    color: var(--ink);
+  }
+
+  .post .eyebrow {
+    display: inline-flex;
+    margin-bottom: var(--s4);
+  }
+
+  .post .eyebrow::after {
+    display: none;
+  }
+
+  .post h1 {
+    max-width: 24ch;
+  }
+
+  .post-meta {
+    margin-top: var(--s4);
+    color: var(--data-gray);
+    font: 500 0.8125rem/1.3 var(--font-mono);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .post-cta {
+    max-width: 60ch;
+    margin-top: var(--s12);
+    padding-top: var(--s8);
+    border-top: 1px solid var(--rule-light);
+  }
+
+  .post-cta-label {
+    margin-bottom: var(--s3);
+    color: var(--data-gray);
+    font: 500 0.75rem/1.3 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .post-cta h2 {
+    max-width: 20ch;
+    font-size: clamp(1.85rem, 3vw, 2.25rem);
+  }
+
+  .post-cta p {
+    max-width: 52ch;
+    margin-top: var(--s3);
+    color: var(--muted);
+    font-size: 1.0625rem;
+  }
+</style>
