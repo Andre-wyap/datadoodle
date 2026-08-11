@@ -1,0 +1,18 @@
+{
+  // Assets-only Worker: the site builds to plain HTML/CSS/JS, so there is no
+  // server code to run and no Astro adapter involved. Cloudflare serves ./dist
+  // directly.
+  //
+  // This file existing is load-bearing. Without a wrangler config, `wrangler
+  // deploy` runs its auto-config, which invokes `astro add cloudflare` and
+  // installs @astrojs/cloudflare — an adapter that does not build against
+  // Astro 7.x and fails with a MISSING_EXPORT on beginContentEntryCollection.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "datadoodle",
+  "compatibility_date": "2026-08-11",
+  "assets": {
+    "directory": "./dist"
+    // html_handling defaults to "auto-trailing-slash", which maps /contact to
+    // dist/contact/index.html — the layout Astro emits.
+  }
+}
